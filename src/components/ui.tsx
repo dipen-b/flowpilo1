@@ -1,4 +1,12 @@
-import { riskMeta, priorityMeta, statusMeta, type RiskLevel, type Priority, type Status, type Member } from "@/lib/data";
+import { riskMeta, priorityMeta, statusMeta, type RiskLevel, type Priority, type Status } from "@/lib/data";
+
+/** Minimal shape Avatar needs — satisfied by both mock members and DB users. */
+export interface AvatarPerson {
+  id: string;
+  name: string;
+  initials: string;
+  color: string;
+}
 
 export function Card({ children, className = "", title, action }: { children: React.ReactNode; className?: string; title?: string; action?: React.ReactNode }) {
   return (
@@ -43,7 +51,7 @@ export function StatusPill({ s }: { s: Status }) {
   );
 }
 
-export function Avatar({ member, size = 28 }: { member: Member; size?: number }) {
+export function Avatar({ member, size = 28 }: { member: AvatarPerson; size?: number }) {
   return (
     <span
       title={member.name}
@@ -55,7 +63,7 @@ export function Avatar({ member, size = 28 }: { member: Member; size?: number })
   );
 }
 
-export function AvatarStack({ people, size = 26 }: { people: Member[]; size?: number }) {
+export function AvatarStack({ people, size = 26 }: { people: AvatarPerson[]; size?: number }) {
   return (
     <span className="flex -space-x-2">
       {people.map((m) => (
