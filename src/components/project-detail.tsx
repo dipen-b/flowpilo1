@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, KanbanSquare, List, GanttChartSquare, CalendarDays } from "lucide-react";
 import { Card, RiskBadge, PriorityBadge, StatusPill, Avatar, Progress } from "@/components/ui";
-import { statusMeta, riskMeta, type Status, type Priority, type RiskLevel, type Member } from "@/lib/data";
+import { TaskModal } from "@/components/task-modal";
+import { statusMeta, riskMeta, type Status, type Priority, type RiskLevel } from "@/lib/data";
 
 const COLUMNS: Status[] = ["backlog", "todo", "in_progress", "in_review", "done"];
 type View = "board" | "list" | "timeline" | "calendar";
@@ -22,15 +24,14 @@ type Project = {
   tasks: Task[];
 };
 
-function asMember(a: Assignee): Member {
-  return { id: a?.id ?? "?", name: a?.name ?? "Unassigned", initials: a?.initials ?? "—",
-    color: a?.color ?? "var(--ink-3)", role: "", capacity: 40, load: 0, productivity: 0, burnoutRisk: "good" };
-}
-
-function TaskCard({ t }: { t: Task }) {
+function TaskCard({ t, onDragStart }: { t: Task; onDragStart: (e: React.DragEvent, id: string) => void }) {
   return (
-    <motion.div layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="cursor-pointer rounded-xl border border-line bg-surface p-3 shadow-sm transition hover:border-line-strong hover:shadow-md">
+    <motion.div
+      layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      draggable
+      onDragStart={(e) => onDragStart(e as unknown as React.DragEvent, t.id)}
+      className="cursor-grab rounded-xl border border-line bg-surface p-3 shadow-sm transition hover:border-line-strong hover:shadow-md active:cursor-grabbing"
+    >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-semibold text-ink-3 tabular">{t.key}</span>
         <PriorityBadge p={t.priority as Priority} />
@@ -49,7 +50,7 @@ function TaskCard({ t }: { t: Task }) {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] text-ink-3 tabular">{t.due}</span>
-          {t.assignee && <Avatar member={asMember(t.assignee)} size={20} />}
+          {t.assignee && <Avatar member={t.assignee} size={20} />}
         </div>
       </div>
     </motion.div>
@@ -57,8 +58,48 @@ function TaskCard({ t }: { t: Task }) {
 }
 
 export function ProjectDetail({ project }: { project: Project }) {
-  const items = project.tasks;
+  const router = useRouter();
+  const [items, setItems] = useState<Task[]>(project.tasks);
   const [view, setView] = useState<View>("board");
+  const [dragOver, setDragOver] = useState<Status | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalStatus, setModalStatus] = useState<string>("backlog");
+
+  // Keep local state in sync when the server refreshes the page data
+  useEffect(() => setItems(project.tasks), [project.tasks]);
+
+  const onDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData("text/task-id", id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const onDrop = async (e: React.DragEvent, col: Status) => {
+    e.preventDefault();
+    setDragOver(null);
+    const id = e.dataTransfer.getData("text/task-id");
+    if (!id) return;
+    const task = items.find((t) => t.id === id);
+    if (!task || task.status === col) return;
+
+    const previous = items;
+    // Optimistic update
+    setItems((prev) => prev.map((t) => (t.id === id ? { ...t, status: col } : t)));
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: col }),
+    });
+    if (!res.ok) {
+      setItems(previous); // roll back on failure
+      return;
+    }
+    router.refresh();
+  };
+
+  const openModal = (status: string) => {
+    setModalStatus(status);
+    setModalOpen(true);
+  };
 
   const views: { key: View; label: string; icon: typeof List }[] = [
     { key: "board", label: "Board", icon: KanbanSquare },
@@ -69,6 +110,8 @@ export function ProjectDetail({ project }: { project: Project }) {
 
   return (
     <div className="mx-auto max-w-7xl space-y-5">
+      <TaskModal projectId={project.id} open={modalOpen} initialStatus={modalStatus} onClose={() => setModalOpen(false)} />
+
       <div className="float-up flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl" style={{ background: "var(--surface-2)" }}>{project.emoji}</span>
@@ -84,7 +127,7 @@ export function ProjectDetail({ project }: { project: Project }) {
         </div>
         <div className="flex gap-2">
           <button className="btn-ghost px-3.5 py-2 text-sm">Settings</button>
-          <button className="btn-primary px-3.5 py-2 text-sm"><Plus size={14} /> New task</button>
+          <button onClick={() => openModal("backlog")} className="btn-primary px-3.5 py-2 text-sm"><Plus size={14} /> New task</button>
         </div>
       </div>
 
@@ -126,9 +169,20 @@ export function ProjectDetail({ project }: { project: Project }) {
                   <span className="text-xs font-semibold text-ink-2">{statusMeta[col].label}</span>
                   <span className="text-xs text-ink-3 tabular">{colTasks.length}</span>
                 </div>
-                <div className="space-y-2.5 rounded-2xl bg-surface-2 p-2.5 min-h-24">
-                  {colTasks.map((t) => <TaskCard key={t.id} t={t} />)}
-                  <button className="w-full rounded-xl border border-dashed border-line-strong py-2 text-xs font-medium text-ink-3 transition hover:text-ink">
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(col); }}
+                  onDragLeave={() => setDragOver((d) => (d === col ? null : d))}
+                  onDrop={(e) => onDrop(e, col)}
+                  className="space-y-2.5 rounded-2xl p-2.5 min-h-24 transition"
+                  style={{
+                    background: dragOver === col ? "var(--brand-soft)" : "var(--surface-2)",
+                    outline: dragOver === col ? "2px dashed var(--brand)" : "none",
+                    outlineOffset: -2,
+                  }}
+                >
+                  {colTasks.map((t) => <TaskCard key={t.id} t={t} onDragStart={onDragStart} />)}
+                  <button onClick={() => openModal(col)}
+                    className="w-full rounded-xl border border-dashed border-line-strong py-2 text-xs font-medium text-ink-3 transition hover:text-ink">
                     + Add task
                   </button>
                 </div>
@@ -161,7 +215,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                   <td className="px-4 py-3"><PriorityBadge p={t.priority as Priority} /></td>
                   <td className="px-4 py-3">
                     <span className="flex items-center gap-2">
-                      {t.assignee && <Avatar member={asMember(t.assignee)} size={22} />}
+                      {t.assignee && <Avatar member={t.assignee} size={22} />}
                       <span className="text-xs">{t.assignee?.name.split(" ")[0] ?? "—"}</span>
                     </span>
                   </td>
@@ -196,7 +250,6 @@ export function ProjectDetail({ project }: { project: Project }) {
             })}
           </div>
           <p className="mt-4 text-xs text-ink-2">
-            Critical path runs through {items[0]?.key} → KYC epic.
             Milestone “Release Candidate” scheduled for {project.dueDate}.
           </p>
         </Card>

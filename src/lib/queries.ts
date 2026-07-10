@@ -66,6 +66,31 @@ export async function getInsights() {
   return db.aiInsight.findMany({ orderBy: { createdAt: "asc" } });
 }
 
+export async function getActiveSprint() {
+  const sprint = await db.sprint.findFirst({
+    where: { status: "active" },
+    include: {
+      project: true,
+      items: { include: { assignee: true }, orderBy: { createdAt: "asc" } },
+    },
+  });
+  if (!sprint) return null;
+  const total = sprint.items.reduce((s, t) => s + t.estimate, 0);
+  const done = sprint.items.filter((t) => t.status === "done").reduce((s, t) => s + t.estimate, 0);
+  return {
+    id: sprint.id,
+    name: sprint.name,
+    goal: sprint.goal,
+    startDate: sprint.startDate ?? "",
+    endDate: sprint.endDate ?? "",
+    projectName: sprint.project.name,
+    totalPoints: total,
+    donePoints: done,
+    progress: total ? Math.round((done / total) * 100) : 0,
+    items: sprint.items.map(shapeTask),
+  };
+}
+
 export async function getActivity() {
   return db.activityLog.findMany({ orderBy: { createdAt: "desc" }, take: 8 });
 }
