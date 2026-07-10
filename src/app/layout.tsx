@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FlowPilot — Project Management on Autopilot",
+  title: "FlowPilot — Project management, beautifully simple",
   description:
-    "FlowPilot uses AI to plan projects, create tasks, manage sprints, detect risks, and keep your team aligned automatically.",
+    "FlowPilot helps teams plan projects, run sprints, and track work with boards, timelines, and analytics that are fast to set up and a pleasure to use.",
 };
 
 const themeInit = `(function(){try{var t=localStorage.getItem('fp-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, FolderKanban, Timer, Users, BarChart3, FileText,
-  Zap, Settings, Sparkles, Sun, Moon, Search, Bell, Menu, X,
+  Zap, Settings, Compass, Sun, Moon, Search, Bell, Menu, X,
 } from "lucide-react";
 
 const NAV = [
@@ -14,7 +14,7 @@ const NAV = [
   { href: "/sprints", label: "Sprints", icon: Timer },
   { href: "/team", label: "Team", icon: Users },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/docs", label: "Docs Hub", icon: FileText },
+  { href: "/docs", label: "Docs", icon: FileText },
   { href: "/automations", label: "Automations", icon: Zap },
   { href: "/admin", label: "Admin", icon: Settings },
 ];
@@ -43,7 +43,7 @@ export function Logo({ size = 15 }: { size?: number }) {
     <Link href="/" className="flex items-center gap-2 font-bold tracking-tight">
       <span className="flex h-7 w-7 items-center justify-center rounded-lg text-white"
         style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}>
-        <Sparkles size={size} />
+        <Compass size={size} />
       </span>
       FlowPilot
     </Link>
@@ -79,11 +79,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="px-5 py-5"><Logo /></div>
         {nav}
         <div className="mt-auto p-4">
-          <div className="rounded-xl border border-line p-3" style={{ background: "var(--brand-soft)" }}>
-            <p className="text-xs font-semibold" style={{ color: "var(--brand)" }}>✨ AI Credits</p>
-            <p className="mt-1 text-[11px] text-ink-2">2,140 / 5,000 used this month</p>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface">
-              <div className="h-full w-[43%] rounded-full" style={{ background: "var(--brand)" }} />
+          <div className="rounded-xl border border-line p-3">
+            <p className="text-xs font-semibold">Sprint 14</p>
+            <p className="mt-1 text-[11px] text-ink-2">4 days left · 62% complete</p>
+            <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-2">
+              <div className="h-full w-[62%] rounded-full" style={{ background: "var(--brand)" }} />
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </button>
           <div className="hidden max-w-md flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-ink-3 sm:flex">
             <Search size={14} />
-            <span className="text-xs">Search or ask AI anything…</span>
+            <span className="text-xs">Search projects, tasks, people…</span>
             <kbd className="ml-auto rounded border border-line bg-surface-2 px-1.5 text-[10px] font-medium">⌘K</kbd>
           </div>
           <div className="ml-auto flex items-center gap-2.5">

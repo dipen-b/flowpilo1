@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Sparkles, ArrowRight, AlertTriangle, CalendarDays } from "lucide-react";
+import { ArrowRight, AlertTriangle, CalendarDays, Plus } from "lucide-react";
 import { Card, RiskBadge, PriorityBadge, Progress, Stat, Avatar } from "@/components/ui";
 import { HealthRing, Sparkline, Burndown, WorkloadHeatmap } from "@/components/charts";
 import {
-  projects, tasks, members, riskAlerts, aiRecommendations, activityFeed,
+  projects, tasks, riskAlerts, activityFeed,
   burndown, workloadHeat, memberById, riskMeta,
 } from "@/lib/data";
 
@@ -13,42 +13,21 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-5">
-      {/* Greeting + AI briefing */}
+      {/* Greeting */}
       <div className="float-up flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Good morning, Dipen 👋</h1>
-          <p className="mt-1 text-sm text-ink-2">
-            Thursday, Jul 10 · <span className="font-medium" style={{ color: "var(--brand)" }}>Your AI briefing is ready</span>
-          </p>
+          <p className="mt-1 text-sm text-ink-2">Thursday, Jul 10 · 4 active projects · 1 needs attention</p>
         </div>
         <div className="flex gap-2">
           <button className="btn-ghost px-4 py-2 text-sm"><CalendarDays size={14} /> This week</button>
-          <button className="btn-primary px-4 py-2 text-sm"><Sparkles size={14} /> Ask Copilot</button>
+          <button className="btn-primary px-4 py-2 text-sm"><Plus size={14} /> New task</button>
         </div>
       </div>
 
-      {/* AI daily briefing banner */}
-      <Card className="float-up" >
-        <div className="flex flex-wrap items-start gap-4">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white"
-            style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}>
-            <Sparkles size={18} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Today&apos;s focus, from your AI Project Manager</p>
-            <p className="mt-1 text-sm leading-relaxed text-ink-2">
-              Ship <span className="font-medium text-ink">BANK-142 (biometric login)</span> — it gates Friday&apos;s release candidate.
-              Unblock <span className="font-medium text-ink">PORT-91</span> first: it&apos;s a 4-hour review holding up 5 tasks.
-              The Data Platform migration needs a decision on rebalancing today to avoid a 17-day slip.
-            </p>
-          </div>
-          <button className="btn-ghost shrink-0 px-3.5 py-2 text-xs">Full briefing <ArrowRight size={13} /></button>
-        </div>
-      </Card>
-
       {/* Score row */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <Card title="AI Health Score" className="float-up">
+        <Card title="Project Health" className="float-up">
           <div className="flex items-center gap-4">
             <HealthRing value={72} size={104} label="of 100" />
             <div className="space-y-1.5 text-xs text-ink-2">
@@ -65,19 +44,19 @@ export default function Dashboard() {
         <Card title="Sprint Progress" className="float-up">
           <Stat label="Sprint 14 · 4 days left" value="62%" sub="22 of 40 points burned" />
           <div className="mt-3"><Progress value={62} /></div>
-          <p className="mt-2 text-xs" style={{ color: "var(--warn)" }}>AI: tracking 2 pts behind ideal — recoverable</p>
+          <p className="mt-2 text-xs" style={{ color: "var(--warn)" }}>Tracking 2 pts behind ideal — recoverable</p>
         </Card>
-        <Card title="Delivery Forecast" className="float-up">
-          <Stat label="Next release (Banking v2.4)" value="Aug 25" sub="87% confidence · +3 days vs plan" subColor="var(--good)" />
-          <div className="mt-3"><Sparkline data={[70, 74, 71, 80, 83, 85, 87]} color="var(--series-1)" width={200} height={40} /></div>
+        <Card title="Next Deadline" className="float-up">
+          <Stat label="Banking v2.4 release" value="Aug 22" sub="On schedule · 68% complete" subColor="var(--good)" />
+          <div className="mt-3"><Sparkline data={[40, 45, 52, 58, 61, 65, 68]} color="var(--series-1)" width={200} height={40} /></div>
         </Card>
       </div>
 
       {/* Main grid */}
       <div className="grid gap-5 xl:grid-cols-3">
         <div className="space-y-5 xl:col-span-2">
-          {/* Risk alerts */}
-          <Card title="Risk Alerts" action={<span className="text-xs font-medium text-ink-3">AI-detected · live</span>}>
+          {/* Alerts */}
+          <Card title="Alerts" action={<span className="text-xs font-medium text-ink-3">from deadlines & capacity</span>}>
             <ul className="space-y-3">
               {riskAlerts.map((r) => (
                 <li key={r.id} className="flex flex-wrap items-start gap-3 rounded-xl border border-line p-3.5">
@@ -88,7 +67,7 @@ export default function Dashboard() {
                   </div>
                   <button className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold"
                     style={{ background: "var(--brand-soft)", color: "var(--brand)" }}>
-                    ✨ {r.action}
+                    {r.action}
                   </button>
                 </li>
               ))}
@@ -103,7 +82,7 @@ export default function Dashboard() {
                   <PriorityBadge p={t.priority} />
                   <span className="text-xs font-medium text-ink-3 tabular">{t.key}</span>
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">{t.title}</span>
-                  {t.aiFlag && <span className="hidden text-[11px] md:inline" style={{ color: "var(--brand)" }}>✨ {t.aiFlag}</span>}
+                  {t.aiFlag && <span className="hidden text-[11px] text-ink-3 md:inline">{t.aiFlag}</span>}
                   <Avatar member={memberById(t.assignee)} size={24} />
                   <span className="w-12 text-right text-xs text-ink-3 tabular">{t.due}</span>
                 </li>
@@ -123,18 +102,6 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-5">
-          {/* AI recommendations */}
-          <Card title="AI Recommendations" action={<Sparkles size={14} style={{ color: "var(--brand)" }} />}>
-            <ul className="space-y-3">
-              {aiRecommendations.map((a) => (
-                <li key={a.id} className="rounded-xl p-3" style={{ background: "var(--brand-soft)" }}>
-                  <p className="text-[13px] leading-relaxed"><span className="mr-1">{a.icon}</span>{a.text}</p>
-                  <button className="mt-2 text-xs font-bold" style={{ color: "var(--brand)" }}>{a.cta} →</button>
-                </li>
-              ))}
-            </ul>
-          </Card>
-
           {/* Active projects */}
           <Card title="Active Projects" action={<Link href="/projects" className="text-xs font-semibold" style={{ color: "var(--brand)" }}>View all →</Link>}>
             <ul className="space-y-4">
@@ -149,7 +116,7 @@ export default function Dashboard() {
                       <div className="flex-1"><Progress value={p.progress} color={riskMeta[p.risk].color} /></div>
                       <span className="text-xs font-medium text-ink-3 tabular">{p.progress}%</span>
                     </div>
-                    <p className="mt-2 text-[11px] text-ink-3">AI forecast: {p.prediction.date} · {p.prediction.confidence}% confidence</p>
+                    <p className="mt-2 text-[11px] text-ink-3">Due {p.dueDate} · {p.prediction.confidence}% on track</p>
                   </Link>
                 </li>
               ))}
@@ -174,8 +141,7 @@ export default function Dashboard() {
             <ul className="space-y-3">
               {activityFeed.map((f) => (
                 <li key={f.id} className="flex gap-2.5 text-[13px] leading-snug">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ background: f.who === "FlowPilot AI" ? "var(--brand)" : "var(--ink-3)" }} />
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "var(--ink-3)" }} />
                   <p className="text-ink-2">
                     <span className="font-semibold text-ink">{f.who}</span> {f.what}
                     <span className="ml-1 text-[11px] text-ink-3">{f.when}</span>

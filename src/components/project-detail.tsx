@@ -2,15 +2,30 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Plus, KanbanSquare, List, GanttChartSquare, CalendarDays } from "lucide-react";
+import { Plus, KanbanSquare, List, GanttChartSquare, CalendarDays } from "lucide-react";
 import { Card, RiskBadge, PriorityBadge, StatusPill, Avatar, Progress } from "@/components/ui";
-import {
-  projectById, tasksForProject, memberById, statusMeta, riskMeta,
-  type Status, type Task,
-} from "@/lib/data";
+import { statusMeta, riskMeta, type Status, type Priority, type RiskLevel, type Member } from "@/lib/data";
 
 const COLUMNS: Status[] = ["backlog", "todo", "in_progress", "in_review", "done"];
 type View = "board" | "list" | "timeline" | "calendar";
+
+type Assignee = { id: string; name: string; initials: string; color: string } | null;
+type Task = {
+  id: string; key: string; title: string; status: string; priority: string;
+  labels: string[]; estimate: number; spent: number; due: string; aiFlag?: string;
+  assignee: Assignee;
+};
+type Project = {
+  id: string; name: string; key: string; emoji: string; risk: string; progress: number;
+  dueDate: string; summary: string; sprint: string;
+  prediction: { date: string; confidence: number; delta: string };
+  tasks: Task[];
+};
+
+function asMember(a: Assignee): Member {
+  return { id: a?.id ?? "?", name: a?.name ?? "Unassigned", initials: a?.initials ?? "—",
+    color: a?.color ?? "var(--ink-3)", role: "", capacity: 40, load: 0, productivity: 0, burnoutRisk: "good" };
+}
 
 function TaskCard({ t }: { t: Task }) {
   return (
@@ -18,12 +33,12 @@ function TaskCard({ t }: { t: Task }) {
       className="cursor-pointer rounded-xl border border-line bg-surface p-3 shadow-sm transition hover:border-line-strong hover:shadow-md">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-semibold text-ink-3 tabular">{t.key}</span>
-        <PriorityBadge p={t.priority} />
+        <PriorityBadge p={t.priority as Priority} />
       </div>
       <p className="mt-1.5 text-[13px] font-medium leading-snug">{t.title}</p>
       {t.aiFlag && (
-        <p className="mt-2 rounded-lg px-2 py-1 text-[11px] leading-snug" style={{ background: "var(--brand-soft)", color: "var(--brand)" }}>
-          ✨ {t.aiFlag}
+        <p className="mt-2 rounded-lg px-2 py-1 text-[11px] leading-snug" style={{ background: "var(--surface-2)", color: "var(--ink-2)" }}>
+          {t.aiFlag}
         </p>
       )}
       <div className="mt-2.5 flex items-center justify-between">
@@ -34,16 +49,15 @@ function TaskCard({ t }: { t: Task }) {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="text-[10px] text-ink-3 tabular">{t.due}</span>
-          <Avatar member={memberById(t.assignee)} size={20} />
+          {t.assignee && <Avatar member={asMember(t.assignee)} size={20} />}
         </div>
       </div>
     </motion.div>
   );
 }
 
-export function ProjectDetail({ id }: { id: string }) {
-  const project = projectById(id);
-  const items = tasksForProject(id);
+export function ProjectDetail({ project }: { project: Project }) {
+  const items = project.tasks;
   const [view, setView] = useState<View>("board");
 
   const views: { key: View; label: string; icon: typeof List }[] = [
@@ -61,17 +75,16 @@ export function ProjectDetail({ id }: { id: string }) {
           <div>
             <div className="flex items-center gap-2.5">
               <h1 className="text-xl font-bold tracking-tight">{project.name}</h1>
-              <RiskBadge level={project.risk} />
+              <RiskBadge level={project.risk as RiskLevel} />
             </div>
             <p className="mt-0.5 text-sm text-ink-2">
-              {project.sprint} · due {project.dueDate} · AI forecast{" "}
-              <span className="font-semibold text-ink">{project.prediction.date}</span> ({project.prediction.confidence}% confidence)
+              {project.sprint || "No active sprint"} · due {project.dueDate} · <span className="font-semibold text-ink">{project.prediction.confidence}%</span> on track
             </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="btn-ghost px-3.5 py-2 text-sm"><Plus size={14} /> Task</button>
-          <button className="btn-primary px-3.5 py-2 text-sm"><Sparkles size={14} /> AI actions</button>
+          <button className="btn-ghost px-3.5 py-2 text-sm">Settings</button>
+          <button className="btn-primary px-3.5 py-2 text-sm"><Plus size={14} /> New task</button>
         </div>
       </div>
 
@@ -81,10 +94,10 @@ export function ProjectDetail({ id }: { id: string }) {
             <div className="flex items-center justify-between text-xs text-ink-2">
               <span>Progress</span><span className="font-semibold tabular">{project.progress}%</span>
             </div>
-            <div className="mt-1.5"><Progress value={project.progress} color={riskMeta[project.risk].color} /></div>
+            <div className="mt-1.5"><Progress value={project.progress} color={riskMeta[project.risk as RiskLevel].color} /></div>
           </div>
           <p className="flex-[2] text-[13px] leading-relaxed text-ink-2">
-            <span className="font-semibold" style={{ color: "var(--brand)" }}>✨ AI status:</span> {project.summary}
+            <span className="font-semibold text-ink">Status:</span> {project.summary}
           </p>
         </div>
       </Card>
@@ -144,9 +157,14 @@ export function ProjectDetail({ id }: { id: string }) {
                 <tr key={t.id} className="transition hover:bg-surface-2">
                   <td className="px-4 py-3 text-xs font-semibold text-ink-3 tabular">{t.key}</td>
                   <td className="px-4 py-3 font-medium">{t.title}</td>
-                  <td className="px-4 py-3"><StatusPill s={t.status} /></td>
-                  <td className="px-4 py-3"><PriorityBadge p={t.priority} /></td>
-                  <td className="px-4 py-3"><span className="flex items-center gap-2"><Avatar member={memberById(t.assignee)} size={22} /><span className="text-xs">{memberById(t.assignee).name.split(" ")[0]}</span></span></td>
+                  <td className="px-4 py-3"><StatusPill s={t.status as Status} /></td>
+                  <td className="px-4 py-3"><PriorityBadge p={t.priority as Priority} /></td>
+                  <td className="px-4 py-3">
+                    <span className="flex items-center gap-2">
+                      {t.assignee && <Avatar member={asMember(t.assignee)} size={22} />}
+                      <span className="text-xs">{t.assignee?.name.split(" ")[0] ?? "—"}</span>
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-right text-xs tabular" style={t.spent > t.estimate ? { color: "var(--critical)" } : undefined}>{t.estimate}h / {t.spent}h</td>
                   <td className="px-4 py-3 text-right text-xs tabular">{t.due}</td>
                 </tr>
@@ -169,7 +187,7 @@ export function ProjectDetail({ id }: { id: string }) {
                 <div key={t.id} className="group relative h-9 rounded-lg bg-surface-2">
                   <div
                     className="absolute top-1 flex h-7 items-center gap-2 overflow-hidden rounded-md px-2.5 text-[11px] font-semibold text-white transition group-hover:brightness-110"
-                    style={{ left: `${start}%`, width: `${width}%`, background: statusMeta[t.status].color, minWidth: 90 }}
+                    style={{ left: `${start}%`, width: `${width}%`, background: statusMeta[t.status as Status].color, minWidth: 90 }}
                     title={t.title}>
                     <span className="truncate">{t.key} · {t.title}</span>
                   </div>
@@ -178,8 +196,8 @@ export function ProjectDetail({ id }: { id: string }) {
             })}
           </div>
           <p className="mt-4 text-xs text-ink-2">
-            <span className="font-semibold" style={{ color: "var(--brand)" }}>✨ AI:</span> critical path runs through {items[0]?.key} → KYC epic.
-            Milestone “Release Candidate” predicted {project.prediction.date}.
+            Critical path runs through {items[0]?.key} → KYC epic.
+            Milestone “Release Candidate” scheduled for {project.dueDate}.
           </p>
         </Card>
       )}
@@ -198,7 +216,7 @@ export function ProjectDetail({ id }: { id: string }) {
                   <p className={`text-[10px] tabular ${day === 10 ? "font-bold" : "text-ink-3"}`}
                     style={day === 10 ? { color: "var(--brand)" } : undefined}>{day}</p>
                   {dayTasks.map((t) => (
-                    <p key={t.id} className="mt-1 truncate rounded px-1.5 py-0.5 text-[10px] font-medium text-white" style={{ background: statusMeta[t.status].color }}>
+                    <p key={t.id} className="mt-1 truncate rounded px-1.5 py-0.5 text-[10px] font-medium text-white" style={{ background: statusMeta[t.status as Status].color }}>
                       {t.key}
                     </p>
                   ))}

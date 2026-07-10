@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Sparkles, Bot, CalendarClock, TrendingUp, Mic, GitPullRequest,
-  FileText, Workflow, Play, Check, ChevronDown, Shield, Zap, Users,
+  KanbanSquare, Timer, GanttChartSquare, Users, BarChart3, Zap,
+  GitPullRequest, FileText, Play, Check, ChevronDown, Layers, Gauge,
 } from "lucide-react";
 import { Logo, ThemeToggle } from "@/components/shell";
 import { useState } from "react";
@@ -16,41 +16,41 @@ const fadeUp = {
   transition: { duration: 0.5, ease: "easeOut" as const },
 };
 
-const AI_FEATURES = [
-  { icon: Bot, title: "AI Project Manager", desc: "A copilot that plans projects, writes tasks, assigns owners by skill and capacity, and follows up — like a PM who never sleeps." },
-  { icon: CalendarClock, title: "Auto Sprint Planning", desc: "One click turns your backlog into a sprint sized to real team velocity, with capacity balancing built in." },
-  { icon: TrendingUp, title: "Delivery Predictor", desc: "Know your ship date before your standup does — forecasts with confidence levels, updated live." },
-  { icon: Mic, title: "Voice & Meeting to Tasks", desc: "Speak naturally or upload a recording. FlowPilot extracts action items and creates work items instantly." },
-  { icon: GitPullRequest, title: "Auto Status Updates", desc: "Commits, PRs, and comments update task status automatically. Nobody fills in Jira fields ever again." },
-  { icon: FileText, title: "One-Click Documentation", desc: "Release notes, sprint reports, and executive summaries generated from real project data in seconds." },
-  { icon: Shield, title: "Risk & Burnout Detection", desc: "Spots slipping deadlines, blocked chains, and overloaded teammates weeks before they become fires." },
-  { icon: Workflow, title: "Smart Workflow Builder", desc: "Describe a workflow in plain English — “when a PR merges, move the task and notify QA” — and AI builds it." },
+const FEATURES = [
+  { icon: KanbanSquare, title: "Boards, lists & calendar", desc: "See work your way. Drag tasks across a Kanban board, sort a list, or lay it out on a calendar — same data, instant switch." },
+  { icon: Timer, title: "Sprints & backlogs", desc: "Plan sprints from your backlog, track burndown and velocity, and run retrospectives — full Scrum and Kanban support." },
+  { icon: GanttChartSquare, title: "Timeline & dependencies", desc: "Map milestones and dependencies on a clean timeline so everyone can see the critical path at a glance." },
+  { icon: Users, title: "Team workload", desc: "Balance capacity across the team, spot who's overloaded, and keep utilization healthy — no spreadsheets." },
+  { icon: BarChart3, title: "Analytics & reports", desc: "Portfolio health, delivery trends, and budget tracking in dashboards that are actually readable." },
+  { icon: Zap, title: "Automations", desc: "Rules that do the busywork: when a PR merges, move the task and notify the channel. Set once, runs forever." },
+  { icon: GitPullRequest, title: "Integrations", desc: "Connect GitHub, GitLab, Slack, and Figma. Commits and pull requests keep task status up to date automatically." },
+  { icon: FileText, title: "Docs", desc: "Keep release notes, specs, and reports next to the work they describe — versioned and searchable." },
 ];
 
 const STEPS = [
-  { n: "01", title: "Describe your project", desc: "“Build a mobile banking app by October.” That's it — no forms, no configuration wizards." },
-  { n: "02", title: "AI builds the plan", desc: "Epics, stories, estimates, owners, and a sprint schedule appear in seconds, tuned to your team." },
-  { n: "03", title: "Ship on autopilot", desc: "Statuses update from real activity, risks surface early, and reports write themselves." },
+  { n: "01", title: "Create a project", desc: "Start from a template or a blank board. Add your team and you're ready in under a minute." },
+  { n: "02", title: "Plan your sprint", desc: "Pull work from the backlog, set estimates and owners, and commit to a sprint your team can actually finish." },
+  { n: "03", title: "Track to done", desc: "Statuses update from your commits and pull requests, so the board stays honest without anyone updating tickets." },
 ];
 
 const TESTIMONIALS = [
-  { quote: "We deleted 14 Jira workflows and replaced them with one sentence to FlowPilot. Sprint planning went from 3 hours to 10 minutes.", name: "Maya Krishnan", role: "VP Engineering, Finlay" },
-  { quote: "The delivery predictor called our slip 3 weeks before anyone felt it. We re-scoped early and still hit the launch date.", name: "Tom Erikson", role: "Head of Product, Northbeam" },
-  { quote: "Our standup is now 5 minutes. FlowPilot already knows what moved, what's stuck, and who needs help.", name: "Alicia Gomez", role: "Engineering Manager, Parcelo" },
+  { quote: "We moved off Jira and cut our workflow config from 14 boards to one clean setup. Sprint planning went from 3 hours to 20 minutes.", name: "Maya Krishnan", role: "VP Engineering, Finlay" },
+  { quote: "The timeline view finally gave leadership a picture they trust. We caught a slip weeks early and re-scoped before it hurt.", name: "Tom Erikson", role: "Head of Product, Northbeam" },
+  { quote: "Our standup is 5 minutes now. Everyone can see what moved and what's blocked without asking.", name: "Alicia Gomez", role: "Engineering Manager, Parcelo" },
 ];
 
 const FAQS = [
-  { q: "How is FlowPilot different from Jira or ClickUp?", a: "Traditional tools are databases you fill in manually. FlowPilot is an AI project manager that does the filling — it creates tasks, plans sprints, updates statuses from real activity, and predicts delivery. You manage outcomes, not tickets." },
-  { q: "Can the AI really create a full project plan?", a: "Yes. Describe the goal in one sentence and FlowPilot generates epics, stories, estimates, dependencies, and a sprint schedule calibrated to your team's historical velocity. You review and adjust — it does the typing." },
-  { q: "Does it work with our existing tools?", a: "FlowPilot connects to GitHub, GitLab, Slack, Google Meet, Zoom, and Figma. Commits and PRs update task status automatically; meeting recordings become action items." },
-  { q: "Is our data used to train AI models?", a: "No. Your workspace data is never used for model training. Enterprise plans add dedicated model deployments, SSO, and full audit logs." },
-  { q: "How long does migration from Jira take?", a: "Minutes. Point FlowPilot at your Jira export and the AI maps projects, issues, sprints, and users — then suggests a simplified structure you can accept or edit." },
+  { q: "How is FlowPilot different from Jira?", a: "FlowPilot keeps the power teams need — sprints, boards, timelines, dependencies — without the maze of settings and workflows. It's designed to be fast to set up and genuinely pleasant to use every day." },
+  { q: "Does it support both Scrum and Kanban?", a: "Yes. Run continuous Kanban flow or time-boxed sprints with backlogs, burndown, velocity, and retrospectives — switch or mix per project." },
+  { q: "Does it work with our existing tools?", a: "FlowPilot connects to GitHub, GitLab, Slack, and Figma. Commits and pull requests update task status automatically, and notifications land in your channels." },
+  { q: "Can we control who sees what?", a: "Roles and permissions are built in — owner, admin, member, and guest — plus SSO and audit logs on the Enterprise plan." },
+  { q: "How long does migration from Jira take?", a: "Minutes. Import your Jira export and FlowPilot maps projects, issues, sprints, and users, then lets you accept or simplify the structure." },
 ];
 
 const PLANS = [
-  { name: "Free", price: "$0", note: "forever", features: ["Up to 5 users", "3 projects", "Basic AI copilot", "Board, list & calendar views", "Community support"], cta: "Start Free", featured: false },
-  { name: "Pro", price: "$12", note: "per user / month", features: ["Unlimited projects", "Advanced AI planning & predictions", "Analytics & executive dashboard", "Automations & workflow builder", "Meeting-to-tasks & voice-to-tickets", "Priority support"], cta: "Start 14-day trial", featured: true },
-  { name: "Enterprise", price: "Custom", note: "annual billing", features: ["Unlimited everything", "SSO (SAML / OIDC)", "Dedicated AI models", "Audit logs & advanced security", "Custom data residency", "Dedicated success manager"], cta: "Talk to Sales", featured: false },
+  { name: "Free", price: "$0", note: "forever", features: ["Up to 5 users", "3 projects", "Board, list & calendar views", "Backlog & sprints", "Community support"], cta: "Start Free", featured: false },
+  { name: "Pro", price: "$10", note: "per user / month", features: ["Unlimited projects", "Timeline & dependencies", "Analytics & reports", "Automations", "Integrations", "Priority support"], cta: "Start 14-day trial", featured: true },
+  { name: "Enterprise", price: "Custom", note: "annual billing", features: ["Unlimited everything", "SSO (SAML / OIDC)", "Audit logs & advanced security", "Custom data residency", "Dedicated success manager"], cta: "Talk to Sales", featured: false },
 ];
 
 function Faq({ q, a }: { q: string; a: string }) {
@@ -94,23 +94,23 @@ export default function Landing() {
         <div className="mx-auto max-w-6xl px-5 pb-20 pt-20 text-center md:pt-28">
           <motion.div {...fadeUp}>
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-semibold text-ink-2">
-              <Sparkles size={13} style={{ color: "var(--brand)" }} />
-              Your AI Project Manager has arrived
+              <Gauge size={13} style={{ color: "var(--brand)" }} />
+              Project management that gets out of your way
             </span>
           </motion.div>
           <motion.h1 {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.08 }}
             className="mx-auto mt-6 max-w-3xl text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
-            Project Management on <span className="gradient-text">Autopilot</span>
+            Project management, <span className="gradient-text">beautifully simple</span>
           </motion.h1>
           <motion.p {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.16 }}
             className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-2">
-            FlowPilot uses AI to plan projects, create tasks, manage sprints, detect risks,
-            and keep your team aligned automatically.
+            Plan projects, run sprints, track work, and keep your team aligned — with boards, timelines,
+            and analytics that are fast to set up and a pleasure to use.
           </motion.p>
           <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.24 }}
             className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Link href="/signup" className="btn-primary px-7 py-3 text-sm">Start Free — no card needed</Link>
-            <Link href="/dashboard" className="btn-ghost px-7 py-3 text-sm"><Play size={14} /> Watch Demo</Link>
+            <Link href="/dashboard" className="btn-ghost px-7 py-3 text-sm"><Play size={14} /> View demo</Link>
           </motion.div>
 
           {/* Product mock */}
@@ -122,21 +122,21 @@ export default function Landing() {
             </div>
             <div className="grid gap-4 p-6 sm:grid-cols-3">
               <div className="rounded-xl border border-line p-4">
-                <p className="text-xs font-medium text-ink-3">AI Health Score</p>
+                <p className="text-xs font-medium text-ink-3">Project Health</p>
                 <p className="mt-1 text-3xl font-bold" style={{ color: "var(--good)" }}>84</p>
                 <p className="mt-1 text-xs text-ink-2">3 of 4 projects on track</p>
               </div>
               <div className="rounded-xl border border-line p-4">
-                <p className="text-xs font-medium text-ink-3">Delivery Forecast</p>
-                <p className="mt-1 text-3xl font-bold tabular">Aug 25</p>
-                <p className="mt-1 text-xs" style={{ color: "var(--good)" }}>87% confidence</p>
+                <p className="text-xs font-medium text-ink-3">Sprint 14</p>
+                <p className="mt-1 text-3xl font-bold tabular">62%</p>
+                <p className="mt-1 text-xs" style={{ color: "var(--warn)" }}>4 days left</p>
               </div>
-              <div className="rounded-xl p-4" style={{ background: "var(--brand-soft)" }}>
-                <p className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "var(--brand)" }}>
-                  <Sparkles size={12} /> AI Recommendation
+              <div className="rounded-xl border border-line p-4">
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-2">
+                  <Layers size={12} style={{ color: "var(--brand)" }} /> This week
                 </p>
                 <p className="mt-2 text-xs leading-relaxed text-ink-2">
-                  Rebalance 2 tasks from Rohan to Aarav to protect the Jul 18 release. <span className="font-semibold" style={{ color: "var(--brand)" }}>Apply →</span>
+                  Ship biometric login, clear the Portal design review, and rebalance the Data team.
                 </p>
               </div>
             </div>
@@ -154,13 +154,13 @@ export default function Landing() {
       {/* Product overview */}
       <section className="mx-auto max-w-6xl px-5 py-20">
         <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">You manage outcomes.<br />The AI manages the tickets.</h2>
-          <p className="mt-4 text-ink-2">Jira makes you the database administrator of your own work. FlowPilot flips it: describe what you want, and an AI project manager plans, tracks, updates, and reports — automatically.</p>
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Powerful where it counts.<br />Simple everywhere else.</h2>
+          <p className="mt-4 text-ink-2">Most tools make you the database administrator of your own work. FlowPilot gives you sprints, boards, timelines, and reports — without the endless configuration.</p>
         </motion.div>
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {[
-            { icon: Zap, title: "10x fewer clicks", desc: "Creating a full project plan takes one sentence instead of forty forms." },
-            { icon: Bot, title: "Always-on PM", desc: "The copilot watches activity 24/7 and surfaces exactly what needs you." },
+            { icon: Zap, title: "10x fewer clicks", desc: "Sensible defaults and clean views mean less setup and more shipping." },
+            { icon: Gauge, title: "Fast, always", desc: "Instant navigation and keyboard-first flows keep you in the zone." },
             { icon: Users, title: "Loved by teams", desc: "Beginner-friendly for new hires, powerful enough for enterprise programs." },
           ].map(({ icon: Icon, title, desc }) => (
             <motion.div key={title} {...fadeUp} className="card p-6">
@@ -174,15 +174,15 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* AI features */}
+      {/* Features */}
       <section id="features" className="border-y border-line" style={{ background: "var(--surface)" }}>
         <div className="mx-auto max-w-6xl px-5 py-20">
           <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--brand)" }}>AI Features</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Eight things Jira will never do</h2>
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--brand)" }}>Features</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Everything your team needs to ship</h2>
           </motion.div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {AI_FEATURES.map(({ icon: Icon, title, desc }, i) => (
+            {FEATURES.map(({ icon: Icon, title, desc }, i) => (
               <motion.div key={title} {...fadeUp} transition={{ ...fadeUp.transition, delay: (i % 4) * 0.06 }}
                 className="rounded-2xl border border-line bg-bg p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
                 <Icon size={18} style={{ color: "var(--brand)" }} />
@@ -236,7 +236,7 @@ export default function Landing() {
       <section id="pricing" className="mx-auto max-w-6xl px-5 py-20">
         <motion.div {...fadeUp} className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--brand)" }}>Pricing</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Simple pricing, serious AI</h2>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Simple, honest pricing</h2>
         </motion.div>
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {PLANS.map((p, i) => (
@@ -281,10 +281,10 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-5 pb-24">
         <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl px-8 py-16 text-center text-white"
           style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}>
-          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Put your projects on autopilot today</h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-white/85">Free for teams up to 5. Your AI project manager is ready in 60 seconds.</p>
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Give your projects a home they deserve</h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-white/85">Free for teams up to 5. Set up your first project in 60 seconds.</p>
           <Link href="/signup" className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold transition hover:scale-[1.02]" style={{ color: "var(--brand)" }}>
-            <Sparkles size={15} /> Start Free
+            Start Free
           </Link>
         </motion.div>
       </section>
@@ -294,7 +294,7 @@ export default function Landing() {
         <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <Logo />
-            <p className="mt-3 text-sm text-ink-2">The AI-first project management platform.</p>
+            <p className="mt-3 text-sm text-ink-2">Project management, beautifully simple.</p>
           </div>
           {[
             { h: "Product", links: ["Features", "Pricing", "Integrations", "Changelog", "Roadmap"] },
