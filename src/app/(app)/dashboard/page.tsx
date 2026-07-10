@@ -4,6 +4,7 @@ import { Card, RiskBadge, PriorityBadge, Progress, Stat, Avatar } from "@/compon
 import { HealthRing, Sparkline, Burndown, WorkloadHeatmap } from "@/components/charts";
 import { burndown, riskMeta, type RiskLevel, type Priority } from "@/lib/data";
 import { getDashboard, getTasks, getActiveSprint } from "@/lib/queries";
+import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +16,13 @@ function spreadLoad(load: number): number[] {
 }
 
 export default async function Dashboard() {
-  const [{ projects, members, risks, activity, healthAvg }, tasks, sprint] = await Promise.all([
+  const [{ projects, members, risks, activity, healthAvg }, tasks, sprint, user] = await Promise.all([
     getDashboard(),
     getTasks(),
     getActiveSprint(),
+    getSessionUser(),
   ]);
+  const firstName = user?.name.split(" ")[0] ?? "there";
 
   const focus = tasks.filter((t) => ["urgent", "high"].includes(t.priority) && t.status !== "done").slice(0, 4);
   const deadlines = tasks.filter((t) => t.status !== "done").slice(0, 5);
@@ -34,7 +37,7 @@ export default async function Dashboard() {
       {/* Greeting */}
       <div className="float-up flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Good morning, Dipen 👋</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Good morning, {firstName} 👋</h1>
           <p className="mt-1 text-sm text-ink-2">
             Thursday, Jul 10 · {projects.length} active projects · {critical + atRisk} need attention
           </p>

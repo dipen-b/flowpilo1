@@ -1,12 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, FolderKanban, Timer, Users, BarChart3, FileText,
-  Zap, Settings, Compass, Sun, Moon, Search, Bell, Menu, X,
+  Zap, Settings, Compass, Sun, Moon, Search, Bell, Menu, X, LogOut,
 } from "lucide-react";
+
+export interface ShellUser {
+  id: string;
+  name: string;
+  initials: string;
+  color: string;
+}
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -50,9 +57,17 @@ export function Logo({ size = 15 }: { size?: number }) {
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children, user }: { children: React.ReactNode; user: ShellUser }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  };
 
   const nav = (
     <nav className="flex flex-col gap-0.5 px-3">
@@ -119,8 +134,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full" style={{ background: "var(--critical)" }} />
             </button>
             <ThemeToggle />
-            <span className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
-              style={{ background: "var(--series-4)" }}>DB</span>
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen((o) => !o)}
+                title={user.name}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
+                style={{ background: user.color }}
+              >
+                {user.initials}
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border border-line bg-surface p-1.5 shadow-lg float-up">
+                  <p className="px-3 py-2 text-xs font-semibold">{user.name}</p>
+                  <button onClick={logout}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] font-medium text-ink-2 transition hover:bg-surface-2 hover:text-ink">
+                    <LogOut size={14} /> Log out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
         <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>

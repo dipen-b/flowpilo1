@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { hashPassword } from "../src/lib/password";
 
 const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL ?? "file:./dev.db" });
 const db = new PrismaClient({ adapter });
+
+const DEMO_PASSWORD = "flowpilot123";
 
 async function main() {
   // Clean slate (order matters for FK constraints)
@@ -38,6 +41,7 @@ async function main() {
       data: {
         name: m.name, initials: m.initials, role: m.role, color: m.color,
         capacity: m.capacity, email: `${m.name.split(" ")[0].toLowerCase()}@vasundhara.dev`,
+        passwordHash: hashPassword(DEMO_PASSWORD),
         orgId: org.id,
       },
     });
@@ -114,6 +118,7 @@ async function main() {
   });
 
   console.log(`Seeded org "${org.name}" with ${projectSeed.length} projects, ${taskSeed.length} work items, ${memberSeed.length} users.`);
+  console.log(`Demo logins: <firstname>@vasundhara.dev / ${DEMO_PASSWORD} (e.g. aarav@vasundhara.dev)`);
 }
 
 main()

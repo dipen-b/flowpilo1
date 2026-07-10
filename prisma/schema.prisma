@@ -32,6 +32,7 @@ model User {
   id           String       @id @default(cuid())
   name         String
   email        String       @unique
+  passwordHash String       @default("")
   initials     String
   role         String       @default("member") // owner | admin | member | guest
   color        String       @default("#6366f1")
@@ -39,10 +40,20 @@ model User {
   orgId        String
   org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   memberships  Membership[]
+  sessions     Session[]
   assignedItems WorkItem[]  @relation("Assignee")
   ledProjects  Project[]    @relation("Lead")
   comments     Comment[]
   createdAt    DateTime     @default(now())
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Membership {
