@@ -17,7 +17,7 @@ const ROLES = ["Owner", "Admin", "Member", "Member", "Member", "Guest"];
 
 const AUDIT = [
   { when: "Jul 10, 09:41", who: "Dipen B", what: "Changed Rohan Patel's role from Guest to Member" },
-  { when: "Jul 10, 09:12", who: "FlowPilot AI", what: "Generated Release Notes v2.4.0 (Docs Hub)" },
+  { when: "Jul 10, 09:12", who: "Aarav Shah", what: "Published Release Notes v2.4.0" },
   { when: "Jul 09, 18:03", who: "Aarav Shah", what: "Enabled automation: PR merged → move task to Done" },
   { when: "Jul 09, 14:22", who: "Dipen B", what: "Upgraded workspace to Pro (annual)" },
   { when: "Jul 08, 11:47", who: "Priya Mehta", what: "Connected Figma integration" },
@@ -25,7 +25,7 @@ const AUDIT = [
 
 const INTEGRATIONS = [
   { name: "GitHub", status: "Connected", desc: "Auto status updates from commits & PRs" },
-  { name: "Slack", status: "Connected", desc: "Notifications + AI summaries in channels" },
+  { name: "Slack", status: "Connected", desc: "Notifications + activity in channels" },
   { name: "Google Meet", status: "Connected", desc: "Meeting recordings → tasks" },
   { name: "Figma", status: "Connected", desc: "Design links on tasks" },
   { name: "GitLab", status: "Connect", desc: "Alternative to GitHub" },
@@ -93,9 +93,9 @@ export default function Admin() {
             <p className="mt-1 text-sm text-ink-2">$12 / user / month · 6 seats · renews Jan 09, 2027</p>
             <button className="btn-ghost mt-4 px-4 py-2 text-xs">Manage plan</button>
           </Card>
-          <Card title="AI usage this month">
-            <p className="text-2xl font-bold tabular">2,140 <span className="text-sm font-medium text-ink-3">/ 5,000 credits</span></p>
-            <p className="mt-1 text-sm text-ink-2">Top consumers: sprint planning (34%), reports (28%)</p>
+          <Card title="Seats">
+            <p className="text-2xl font-bold tabular">6 <span className="text-sm font-medium text-ink-3">/ 10 seats used</span></p>
+            <p className="mt-1 text-sm text-ink-2">4 seats available on your current plan</p>
           </Card>
           <Card title="Invoices">
             <ul className="space-y-2 text-sm">
@@ -112,8 +112,8 @@ export default function Admin() {
           {[
             { title: "Single Sign-On (SAML / OIDC)", desc: "Enforce login through your identity provider. Available on Enterprise.", cta: "Upgrade to enable", on: false },
             { title: "Two-factor authentication", desc: "Require 2FA for all workspace members.", cta: "Enforced", on: true },
-            { title: "Data retention", desc: "AI conversation logs are retained for 90 days, then deleted.", cta: "Configure", on: true },
-            { title: "Model training opt-out", desc: "Workspace data is never used to train AI models.", cta: "Always on", on: true },
+            { title: "Data retention", desc: "Activity logs are retained for 90 days, then deleted.", cta: "Configure", on: true },
+            { title: "Data export", desc: "Export your workspace data anytime as JSON or CSV.", cta: "Export", on: true },
           ].map((s) => (
             <Card key={s.title}>
               <div className="flex items-start justify-between gap-3">

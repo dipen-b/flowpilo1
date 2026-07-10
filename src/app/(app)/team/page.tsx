@@ -1,4 +1,4 @@
-import { Sparkles, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Card, Avatar, Progress, RiskBadge, Stat } from "@/components/ui";
 import { Sparkline } from "@/components/charts";
 import { members } from "@/lib/data";
@@ -22,23 +22,8 @@ export default function Team() {
       <div className="grid gap-5 sm:grid-cols-3">
         <Card className="float-up"><Stat label="Avg productivity" value="86" sub="↑ 3 pts this month" subColor="var(--good)" /></Card>
         <Card className="float-up"><Stat label="Utilization" value="93%" sub="Target band: 75–90%" subColor="var(--warn)" /></Card>
-        <Card className="float-up"><Stat label="Team health (AI)" value="B+" sub="1 burnout signal detected" subColor="var(--critical)" /></Card>
+        <Card className="float-up"><Stat label="Over capacity" value="1" sub="Rohan Patel · 128%" subColor="var(--critical)" /></Card>
       </div>
-
-      <Card title="AI Team Coach" action={<Sparkles size={14} style={{ color: "var(--brand)" }} />} className="float-up">
-        <div className="grid gap-3 md:grid-cols-3">
-          {[
-            "Rohan has been >120% capacity for 3 weeks — productivity fell 14%. Move DATA-48 and BANK-144 to Aarav and Nisha.",
-            "Sara has 30% free capacity and the highest review throughput — route Portal design-review QA to her this sprint.",
-            "Team velocity is most stable when WIP ≤ 2 per person. Priya currently has 4 items in progress — suggest focusing two.",
-          ].map((t) => (
-            <div key={t} className="rounded-xl p-3.5 text-[13px] leading-relaxed text-ink-2" style={{ background: "var(--brand-soft)" }}>
-              {t}
-              <p className="mt-2 text-xs font-bold" style={{ color: "var(--brand)" }}>Apply →</p>
-            </div>
-          ))}
-        </div>
-      </Card>
 
       <Card title="Members" className="overflow-x-auto p-0">
         <table className="w-full min-w-[720px] text-sm">
@@ -48,7 +33,7 @@ export default function Team() {
               <th className="px-5 py-3 font-medium">Role</th>
               <th className="px-5 py-3 font-medium">Workload</th>
               <th className="px-5 py-3 font-medium">Productivity trend</th>
-              <th className="px-5 py-3 font-medium">Burnout risk</th>
+              <th className="px-5 py-3 font-medium">Load status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
