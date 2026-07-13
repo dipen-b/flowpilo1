@@ -1,4 +1,5 @@
-import { Plus, Timer, CheckCircle2 } from "lucide-react";
+import { Timer, CheckCircle2 } from "lucide-react";
+import { PlanSprintButton } from "@/components/plan-sprint-button";
 import { Card, PriorityBadge, Progress, Stat, Avatar } from "@/components/ui";
 import { Burndown, VelocityBars } from "@/components/charts";
 import { burndown, velocity, type Priority } from "@/lib/data";
@@ -32,7 +33,7 @@ export default async function Sprints() {
               : "No active sprint — plan one below"}
           </p>
         </div>
-        <button className="btn-primary px-4 py-2 text-sm"><Plus size={14} /> Plan next sprint</button>
+        <PlanSprintButton />
       </div>
 
       <div className="grid gap-5 sm:grid-cols-3">
@@ -86,10 +87,6 @@ export default async function Sprints() {
               <li>· Keep every member at or under capacity</li>
               <li>· Leave 2 buffer slots for review findings</li>
             </ul>
-          </div>
-          <div className="mt-3 flex gap-2">
-            <button className="btn-primary flex-1 px-3 py-2 text-xs">Start sprint</button>
-            <button className="btn-ghost flex-1 px-3 py-2 text-xs">Edit plan</button>
           </div>
         </Card>
       </div>

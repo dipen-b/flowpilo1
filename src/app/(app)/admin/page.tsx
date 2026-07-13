@@ -107,7 +107,7 @@ export default function Admin() {
           <Card title="Current plan">
             <p className="text-2xl font-bold">Pro <span className="text-sm font-medium text-ink-3">· annual</span></p>
             <p className="mt-1 text-sm text-ink-2">$12 / user / month · {members.length || "—"} seats</p>
-            <button className="btn-ghost mt-4 px-4 py-2 text-xs">Manage plan</button>
+            <button disabled title="Available soon" className="btn-ghost mt-4 cursor-default px-4 py-2 text-xs opacity-50">Manage plan</button>
           </Card>
           <Card title="Seats">
             <p className="text-2xl font-bold tabular">{members.length || "—"} <span className="text-sm font-medium text-ink-3">/ 10 seats used</span></p>
@@ -138,7 +138,7 @@ export default function Admin() {
                   {s.on ? "On" : "Off"}
                 </span>
               </div>
-              <button className="btn-ghost mt-4 px-3.5 py-1.5 text-xs">{s.cta}</button>
+              <button disabled title="Available soon" className="btn-ghost mt-4 cursor-default px-3.5 py-1.5 text-xs opacity-50">{s.cta}</button>
             </Card>
           ))}
         </div>
@@ -179,9 +179,9 @@ export default function Admin() {
             <Card key={it.name}>
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{it.name}</h3>
-                <button className="btn-ghost rounded-lg px-3 py-1 text-xs font-semibold">
+                <span className="rounded-lg px-3 py-1 text-xs font-semibold" style={{ background: "var(--surface-2)", color: "var(--ink-3)" }}>
                   Coming soon
-                </button>
+                </span>
               </div>
               <p className="mt-1.5 text-[13px] text-ink-2">{it.desc}</p>
             </Card>

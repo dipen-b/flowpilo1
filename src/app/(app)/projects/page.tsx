@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { NewProjectButton } from "@/components/new-project-button";
 import { Card, RiskBadge, Progress, AvatarStack } from "@/components/ui";
 import { riskMeta, type Member } from "@/lib/data";
 import { getProjects } from "@/lib/queries";
@@ -17,12 +17,9 @@ export default async function Projects() {
       <div className="float-up flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Projects</h1>
-          <p className="mt-1 text-sm text-ink-2">{projects.length} active · <span style={{ color: "var(--good)" }}>live from database</span></p>
+          <p className="mt-1 text-sm text-ink-2">{projects.length} active projects</p>
         </div>
-        <div className="flex gap-2">
-          <button className="btn-ghost px-4 py-2 text-sm">Templates</button>
-          <button className="btn-primary px-4 py-2 text-sm"><Plus size={14} /> New project</button>
-        </div>
+        <NewProjectButton />
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">

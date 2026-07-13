@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, CalendarDays, FolderKanban } from "lucide-react";
+import { AlertTriangle, FolderKanban } from "lucide-react";
 import { Card, RiskBadge, PriorityBadge, Progress, Stat, Avatar } from "@/components/ui";
 import { HealthRing, Sparkline, Burndown, WorkloadHeatmap } from "@/components/charts";
 import { MyTiming } from "@/components/my-timing";
@@ -46,7 +46,6 @@ export default async function Dashboard() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="btn-ghost px-4 py-2 text-sm"><CalendarDays size={14} /> This week</button>
           <Link href="/projects" className="btn-primary px-4 py-2 text-sm"><FolderKanban size={14} /> Go to projects</Link>
         </div>
       </div>
@@ -101,10 +100,12 @@ export default async function Dashboard() {
                     <p className="text-sm font-semibold">{r.title}</p>
                     <p className="mt-0.5 text-xs leading-relaxed text-ink-2">{r.detail}</p>
                   </div>
-                  <button className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold"
-                    style={{ background: "var(--brand-soft)", color: "var(--brand)" }}>
-                    {r.action}
-                  </button>
+                  {r.projectId && (
+                    <Link href={`/projects/${r.projectId}`} className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition hover:opacity-80"
+                      style={{ background: "var(--brand-soft)", color: "var(--brand)" }}>
+                      {r.action}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

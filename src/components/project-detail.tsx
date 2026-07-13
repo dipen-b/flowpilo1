@@ -130,7 +130,6 @@ export function ProjectDetail({ project }: { project: Project }) {
           </div>
         </div>
         <div className="flex gap-2">
-          <button className="btn-ghost px-3.5 py-2 text-sm">Settings</button>
           <button onClick={() => openModal("backlog")} className="btn-primary px-3.5 py-2 text-sm"><Plus size={14} /> New task</button>
         </div>
       </div>
