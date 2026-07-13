@@ -57,10 +57,6 @@ export default function Login() {
       <div className="mt-5 rounded-xl border border-line bg-surface-2 p-3 text-xs leading-relaxed text-ink-2">
         <span className="font-semibold text-ink">Demo account:</span> aarav@vasundhara.dev · password <code className="rounded bg-surface px-1">flowpilot123</code>
       </div>
-
-      <p className="mt-4 text-center text-xs text-ink-3">
-        Forgot password? <a href="#" className="font-medium underline">Reset it</a>
-      </p>
     </AuthFrame>
   );
 }

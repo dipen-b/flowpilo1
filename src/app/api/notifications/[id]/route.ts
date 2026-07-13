@@ -18,7 +18,7 @@ export const PATCH = requireUser(async (req: NextRequest, context: SessionContex
 
     const updated = await db.notification.update({
       where: { id },
-      data: body,
+      data: { read: Boolean(body.read) },
     });
 
     return NextResponse.json(updated);

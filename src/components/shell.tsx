@@ -5,15 +5,22 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, FolderKanban, Timer, Users, BarChart3, FileText,
-  Zap, Settings, Compass, Sun, Moon, Search, Bell, Menu, X, LogOut, Calendar,
+  Zap, Settings, Compass, Sun, Moon, Search, Menu, X, LogOut, Calendar,
 } from "lucide-react";
 import { CommandPalette, useCommandPalette } from "@/components/command-palette";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 export interface ShellUser {
   id: string;
   name: string;
   initials: string;
   color: string;
+}
+
+export interface ShellSprint {
+  name: string;
+  progress: number;
+  daysLeft: number | null;
 }
 
 const NAV = [
@@ -59,7 +66,7 @@ export function Logo({ size = 15 }: { size?: number }) {
   );
 }
 
-export function AppShell({ children, user }: { children: React.ReactNode; user: ShellUser }) {
+export function AppShell({ children, user, sprint }: { children: React.ReactNode; user: ShellUser; sprint?: ShellSprint | null }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -96,15 +103,19 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
       <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-line bg-surface md:flex">
         <div className="px-5 py-5"><Logo /></div>
         {nav}
-        <div className="mt-auto p-4">
-          <div className="rounded-xl border border-line p-3">
-            <p className="text-xs font-semibold">Sprint 14</p>
-            <p className="mt-1 text-[11px] text-ink-2">4 days left · 62% complete</p>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-2">
-              <div className="h-full w-[62%] rounded-full" style={{ background: "var(--brand)" }} />
+        {sprint && (
+          <div className="mt-auto p-4">
+            <div className="rounded-xl border border-line p-3">
+              <p className="text-xs font-semibold">{sprint.name}</p>
+              <p className="mt-1 text-[11px] text-ink-2">
+                {sprint.daysLeft !== null ? `${sprint.daysLeft} days left · ` : ""}{sprint.progress}% complete
+              </p>
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-2">
+                <div className="h-full rounded-full" style={{ width: `${sprint.progress}%`, background: "var(--brand)" }} />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </aside>
 
       {/* Mobile drawer */}
@@ -133,10 +144,7 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
             <kbd className="ml-auto rounded border border-line bg-surface-2 px-1.5 text-[10px] font-medium">⌘K</kbd>
           </button>
           <div className="ml-auto flex items-center gap-2.5">
-            <button className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-line text-ink-2 hover:bg-surface-2" aria-label="Notifications">
-              <Bell size={15} />
-              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full" style={{ background: "var(--critical)" }} />
-            </button>
+            <NotificationsBell />
             <ThemeToggle />
             <div className="relative">
               <button
