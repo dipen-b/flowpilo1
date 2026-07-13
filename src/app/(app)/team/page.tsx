@@ -3,6 +3,7 @@ import { Card, Avatar, Progress, RiskBadge, Stat } from "@/components/ui";
 import { Sparkline } from "@/components/charts";
 import { type RiskLevel } from "@/lib/data";
 import { getMembers } from "@/lib/queries";
+import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,9 @@ function trendFor(index: number): number[] {
 }
 
 export default async function Team() {
-  const members = await getMembers();
+  const session = await getSessionUser();
+  if (!session) return <div>Unauthorized</div>;
+  const members = await getMembers(session.orgId);
   const over = members.filter((m) => m.load > m.capacity);
   const utilization = Math.round(
     (members.reduce((s, m) => s + m.load, 0) / (members.reduce((s, m) => s + m.capacity, 0) || 1)) * 100,

@@ -3,6 +3,7 @@ import { Card, PriorityBadge, Progress, Stat, Avatar } from "@/components/ui";
 import { Burndown, VelocityBars } from "@/components/charts";
 import { burndown, velocity, type Priority } from "@/lib/data";
 import { getActiveSprint } from "@/lib/queries";
+import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,9 @@ const RETRO = [
 ];
 
 export default async function Sprints() {
-  const sprint = await getActiveSprint();
+  const session = await getSessionUser();
+  if (!session) return <div>Unauthorized</div>;
+  const sprint = await getActiveSprint(session.orgId);
   const items = sprint?.items ?? [];
   const doneCount = items.filter((t) => t.status === "done").length;
   const reviewCount = items.filter((t) => t.status === "in_review").length;

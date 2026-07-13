@@ -16,9 +16,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
   }
 
-  // Join the demo organization (single-tenant for now; multi-org signup comes later)
-  const org = await db.organization.findFirst();
-  if (!org) return NextResponse.json({ error: "No organization configured." }, { status: 500 });
+  // Create a new organization for this user
+  const org = await db.organization.create({
+    data: {
+      name: `${name.trim()}'s Team`,
+    },
+  });
+
+  // Create default workspace
+  await db.workspace.create({
+    data: {
+      name: "General",
+      orgId: org.id,
+    },
+  });
 
   const initials = name
     .trim()
@@ -34,14 +45,17 @@ export async function POST(request: Request) {
       passwordHash: hashPassword(password),
       initials: initials || "??",
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      role: "member",
+      role: "owner",
       orgId: org.id,
     },
   });
-  await db.membership.create({ data: { userId: user.id, orgId: org.id, role: "member" } });
+  await db.membership.create({ data: { userId: user.id, orgId: org.id, role: "owner" } });
 
   const { token } = await createSession(user.id);
-  const res = NextResponse.json({ ok: true, user: { id: user.id, name: user.name, email: user.email } }, { status: 201 });
+  const res = NextResponse.json({
+    ok: true,
+    user: { id: user.id, name: user.name, email: user.email, orgId: org.id, role: user.role },
+  }, { status: 201 });
   res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
   return res;
 }

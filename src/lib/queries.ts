@@ -3,8 +3,9 @@ import { db } from "@/lib/db";
 /* Server-side data access. These run in Server Components and Route Handlers.
    They shape DB rows into the view models the UI already expects. */
 
-export async function getProjects() {
+export async function getProjects(orgId: string) {
   const projects = await db.project.findMany({
+    where: { workspace: { orgId } },
     include: { lead: true, workItems: { include: { assignee: true } } },
     orderBy: { createdAt: "asc" },
   });
@@ -25,16 +26,17 @@ export async function getProjects() {
   }));
 }
 
-export async function getProject(id: string) {
+export async function getProject(id: string, orgId: string) {
   const p = await db.project.findUnique({
     where: { id },
     include: {
+      workspace: true,
       lead: true,
       workItems: { include: { assignee: true }, orderBy: { createdAt: "asc" } },
       sprints: true,
     },
   });
-  if (!p) return null;
+  if (!p || p.workspace.orgId !== orgId) return null;
   return {
     id: p.id, name: p.name, key: p.key, emoji: p.emoji, health: p.health,
     risk: p.risk, progress: p.progress, dueDate: p.dueDate ?? "", summary: p.summary,
@@ -44,15 +46,24 @@ export async function getProject(id: string) {
   };
 }
 
-export async function getTasks() {
-  const items = await db.workItem.findMany({ include: { assignee: true, project: true }, orderBy: { createdAt: "asc" } });
+export async function getTasks(orgId: string) {
+  const items = await db.workItem.findMany({
+    where: { project: { workspace: { orgId } } },
+    include: { assignee: true, project: true },
+    orderBy: { createdAt: "asc" },
+  });
   return items.map(shapeTask);
 }
 
-export async function getMembers() {
-  const users = await db.user.findMany({ include: { assignedItems: true }, orderBy: { createdAt: "asc" } });
+export async function getMembers(orgId: string) {
+  const users = await db.user.findMany({
+    where: { orgId },
+    include: { assignedItems: { include: { project: true } } },
+    orderBy: { createdAt: "asc" },
+  });
   return users.map((u) => {
-    const load = u.assignedItems.reduce((sum, t) => sum + (t.status !== "done" ? t.estimate : 0), 0);
+    const orgItems = u.assignedItems.filter((t) => t.project.workspaceId);
+    const load = orgItems.reduce((sum, t) => sum + (t.status !== "done" ? t.estimate : 0), 0);
     const over = load > u.capacity;
     return {
       id: u.id, name: u.name, initials: u.initials, role: u.role, color: u.color,
@@ -62,13 +73,16 @@ export async function getMembers() {
   });
 }
 
-export async function getInsights() {
-  return db.aiInsight.findMany({ orderBy: { createdAt: "asc" } });
+export async function getInsights(orgId: string) {
+  return db.aiInsight.findMany({
+    where: { project: { workspace: { orgId } } },
+    orderBy: { createdAt: "asc" },
+  });
 }
 
-export async function getActiveSprint() {
+export async function getActiveSprint(orgId: string) {
   const sprint = await db.sprint.findFirst({
-    where: { status: "active" },
+    where: { status: "active", project: { workspace: { orgId } } },
     include: {
       project: true,
       items: { include: { assignee: true }, orderBy: { createdAt: "asc" } },
@@ -91,13 +105,17 @@ export async function getActiveSprint() {
   };
 }
 
-export async function getActivity() {
-  return db.activityLog.findMany({ orderBy: { createdAt: "desc" }, take: 8 });
+export async function getActivity(orgId: string) {
+  return db.activityLog.findMany({
+    where: { orgId },
+    orderBy: { createdAt: "desc" },
+    take: 8,
+  });
 }
 
-export async function getDashboard() {
+export async function getDashboard(orgId: string) {
   const [projects, members, insights, activity] = await Promise.all([
-    getProjects(), getMembers(), getInsights(), getActivity(),
+    getProjects(orgId), getMembers(orgId), getInsights(orgId), getActivity(orgId),
   ]);
   const risks = insights.filter((i) => i.kind === "risk");
   const recs = insights.filter((i) => i.kind === "recommendation");

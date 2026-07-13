@@ -16,14 +16,38 @@ export async function destroySession(token: string) {
   await db.session.deleteMany({ where: { token } });
 }
 
-/** Read the session cookie and return the logged-in user, or null. */
-export async function getSessionUser() {
+export interface SessionContext {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    orgId: string;
+    initials: string;
+    color: string;
+  };
+  orgId: string;
+}
+
+/** Read the session cookie and return the logged-in user with org context, or null. */
+export async function getSessionUser(): Promise<SessionContext | null> {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   const session = await db.session.findUnique({ where: { token }, include: { user: true } });
   if (!session || session.expiresAt < new Date()) return null;
-  return session.user;
+  return {
+    user: {
+      id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
+      role: session.user.role,
+      orgId: session.user.orgId,
+      initials: session.user.initials,
+      color: session.user.color,
+    },
+    orgId: session.user.orgId,
+  };
 }
 
 export const sessionCookieOptions = {

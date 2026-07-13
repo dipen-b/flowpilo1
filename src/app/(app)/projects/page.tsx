@@ -3,11 +3,14 @@ import { Plus } from "lucide-react";
 import { Card, RiskBadge, Progress, AvatarStack } from "@/components/ui";
 import { riskMeta, type Member } from "@/lib/data";
 import { getProjects } from "@/lib/queries";
+import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function Projects() {
-  const projects = await getProjects();
+  const session = await getSessionUser();
+  if (!session) return <div>Unauthorized</div>;
+  const projects = await getProjects(session.orgId);
 
   return (
     <div className="mx-auto max-w-7xl space-y-5">

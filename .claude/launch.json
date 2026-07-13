@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "dev",
+      "name": "flowpilot",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "flowpilot-frontend"],
+      "runtimeArgs": ["run", "dev"],
       "port": 3000
     }
   ]
