@@ -26,11 +26,19 @@ export const GET = requireUser(async (req: NextRequest, context: SessionContext)
 });
 
 export const POST = requireUser(async (req: NextRequest, context: SessionContext) => {
+  if (!["owner", "admin"].includes(context.user.role)) {
+    return NextResponse.json({ error: "Only admins can invite members" }, { status: 403 });
+  }
+
   const body = await req.json();
   const { email, role } = body;
 
   if (!email) {
     return NextResponse.json({ error: "Email is required" }, { status: 400 });
+  }
+
+  if (role && !["member", "admin"].includes(role)) {
+    return NextResponse.json({ error: "Invalid role" }, { status: 400 });
   }
 
   const existingUser = await db.user.findUnique({ where: { email } });

@@ -1,7 +1,7 @@
 import { getSessionUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { AttendanceDashboard } from "@/components/attendance/attendance-dashboard";
-import { MarkAttendance } from "@/components/attendance/mark-attendance";
+import { AttendanceDashboardV2 } from "@/components/attendance/attendance-dashboard-v2";
+import { MarkAttendanceV2 } from "@/components/attendance/mark-attendance-v2";
 
 export default async function AttendancePage() {
   const session = await getSessionUser();
@@ -15,12 +15,12 @@ export default async function AttendancePage() {
   return (
     <div className="space-y-8">
       {/* Dashboard */}
-      <AttendanceDashboard isAdmin={isAdmin} />
+      <AttendanceDashboardV2 isAdmin={isAdmin} />
 
       {/* Mark Attendance (Admin Only) */}
       {isAdmin && (
         <div>
-          <MarkAttendance />
+          <MarkAttendanceV2 />
         </div>
       )}
     </div>

@@ -5,47 +5,45 @@ import { SessionContext } from "@/lib/auth";
 
 export const GET = requireUser(async (req: NextRequest, context: SessionContext) => {
   try {
-    // Only owner/admin can view reports
-    if (!["owner", "admin"].includes(context.user.role)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-    }
-
     const url = new URL(req.url);
     const month = url.searchParams.get("month"); // YYYY-MM
-    const userId = url.searchParams.get("userId");
+    const requestedUserId = url.searchParams.get("userId");
+    const isAdmin = ["owner", "admin"].includes(context.user.role);
 
-    const where: any = {};
-    if (userId) where.userId = userId;
+    // Members can only see their own attendance; admins can see anyone in their org.
+    const where: any = { user: { orgId: context.orgId } };
+    if (!isAdmin) {
+      where.userId = context.user.id;
+    } else if (requestedUserId) {
+      where.userId = requestedUserId;
+    }
     if (month) {
-      where.date = {
-        gte: `${month}-01`,
-        lt: `${month}-32`,
-      };
+      where.date = { gte: `${month}-01`, lt: `${month}-32` };
     }
 
     const records = await db.attendance.findMany({
       where,
-      include: { user: { select: { name: true, email: true } } },
+      include: { user: { select: { id: true, name: true, email: true, initials: true, color: true } } },
       orderBy: { date: "asc" },
     });
 
-    // Calculate summary stats
+    const presentRecords = records.filter((r) => r.status === "present");
     const stats = {
+      isAdmin,
       totalDays: records.length,
-      presentDays: records.filter(r => r.status === "present" || r.status === "half-day").length,
-      absentDays: records.filter(r => r.status === "absent").length,
-      leaveDays: records.filter(r => r.status === "leave").length,
-      lateDays: records.filter(r => r.status === "late").length,
+      presentDays: records.filter((r) => r.status === "present" || r.status === "half-day").length,
+      absentDays: records.filter((r) => r.status === "absent").length,
+      leaveDays: records.filter((r) => r.status === "leave").length,
+      lateDays: records.filter((r) => r.status === "late").length,
       totalWorkHours: records.reduce((sum, r) => sum + r.workHours, 0),
       averageWorkHours: Math.round(
-        records.filter(r => r.status === "present").reduce((sum, r) => sum + r.workHours, 0) /
-        Math.max(records.filter(r => r.status === "present").length, 1)
+        presentRecords.reduce((sum, r) => sum + r.workHours, 0) / Math.max(presentRecords.length, 1)
       ),
       records,
     };
 
     return NextResponse.json(stats);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch reports" }, { status: 500 });
   }
 });

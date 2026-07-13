@@ -1,200 +1,172 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Info } from 'lucide-react';
+import { useCallback, useEffect, useState } from "react";
+import { Clock, Coffee, LogOut, Play } from "lucide-react";
 
-interface TimeEntry {
-  id: string;
-  isClockedIn: boolean;
-  clockInTime: string;
-  totalMinutes: number;
-  breaks: Break[];
-}
-
-interface Break {
+interface BreakRec {
   id: string;
   breakInTime: string;
   breakOutTime: string | null;
   durationMinutes: number;
 }
 
+interface TodayEntry {
+  id?: string;
+  clockInTime?: string;
+  clockOutTime?: string | null;
+  totalMinutes?: number;
+  isClockedIn: boolean;
+  breaks?: BreakRec[];
+}
+
+function fmtClock(ms: number): string {
+  const safe = Math.max(0, ms);
+  const h = Math.floor(safe / 3600000);
+  const m = Math.floor((safe % 3600000) / 60000);
+  const s = Math.floor((safe % 60000) / 1000);
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
 export function MyTiming() {
-  const [entry, setEntry] = useState<TimeEntry | null>(null);
-  const [onBreak, setOnBreak] = useState(false);
-  const [currentTime, setCurrentTime] = useState('00:00:00');
-  const [breakTime, setBreakTime] = useState('00:00:00');
+  const [entry, setEntry] = useState<TodayEntry | null>(null);
+  const [workTime, setWorkTime] = useState("00:00:00");
+  const [breakTime, setBreakTime] = useState("00:00:00");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Update current time and break time every second
+  const fetchToday = useCallback(async () => {
+    try {
+      const res = await fetch("/api/time-tracking/today");
+      if (res.ok) setEntry(await res.json());
+    } catch {
+      // transient — keep last state
+    }
+  }, []);
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (entry?.isClockedIn) {
-        const now = new Date();
-        const clockIn = new Date(entry.clockInTime);
-        const totalMs = now.getTime() - clockIn.getTime();
+    fetchToday();
+    const interval = setInterval(fetchToday, 15000);
+    return () => clearInterval(interval);
+  }, [fetchToday]);
 
-        const breakMs = entry.breaks.reduce((sum, b) => {
-          if (b.breakOutTime) {
-            return sum + (new Date(b.breakOutTime).getTime() - new Date(b.breakInTime).getTime());
-          } else {
-            // Current active break
-            return sum + (now.getTime() - new Date(b.breakInTime).getTime());
-          }
-        }, 0);
+  const onBreak = entry?.breaks?.some((b) => !b.breakOutTime) ?? false;
 
-        const workMs = totalMs - breakMs;
-        const hours = Math.floor(workMs / 3600000);
-        const mins = Math.floor((workMs % 3600000) / 60000);
-        const secs = Math.floor((workMs % 60000) / 1000);
-
-        setCurrentTime(`${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
-
-        // Break time
-        const breakHours = Math.floor(breakMs / 3600000);
-        const breakMins = Math.floor((breakMs % 3600000) / 60000);
-        const breakSecs = Math.floor((breakMs % 60000) / 1000);
-
-        setBreakTime(`${String(breakHours).padStart(2, '0')}:${String(breakMins).padStart(2, '0')}:${String(breakSecs).padStart(2, '0')}`);
-      }
-    }, 1000);
-
+  // Tick the timers every second while clocked in
+  useEffect(() => {
+    if (!entry?.isClockedIn || !entry.clockInTime) return;
+    const tick = () => {
+      const now = Date.now();
+      const totalMs = now - new Date(entry.clockInTime!).getTime();
+      const breakMs = (entry.breaks ?? []).reduce((sum, b) => {
+        const end = b.breakOutTime ? new Date(b.breakOutTime).getTime() : now;
+        return sum + (end - new Date(b.breakInTime).getTime());
+      }, 0);
+      setWorkTime(fmtClock(totalMs - breakMs));
+      setBreakTime(fmtClock(breakMs));
+    };
+    tick();
+    const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [entry]);
 
-  // Fetch today's entry
-  useEffect(() => {
-    fetchToday();
-    const interval = setInterval(fetchToday, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  async function fetchToday() {
-    try {
-      const res = await fetch('/api/time-tracking/today');
-      const data = await res.json();
-      setEntry(data);
-      setOnBreak(data.breaks?.some((b: Break) => !b.breakOutTime) || false);
-    } catch (error) {
-      console.error('Failed to fetch:', error);
-    }
-  }
-
-  async function handleClockIn() {
+  async function action(path: string) {
     setLoading(true);
+    setError("");
     try {
-      await fetch('/api/time-tracking/clock-in', { method: 'POST' });
+      const res = await fetch(`/api/time-tracking/${path}`, { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setError(body.error ?? "Something went wrong.");
+      }
       await fetchToday();
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleClockOut() {
-    setLoading(true);
-    try {
-      await fetch('/api/time-tracking/clock-out', { method: 'POST' });
-      await fetchToday();
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Loading initial state — render nothing to avoid a flash
+  if (entry === null) return null;
 
-  async function handleBreakIn() {
-    setLoading(true);
-    try {
-      await fetch('/api/time-tracking/break-in', { method: 'POST' });
-      await fetchToday();
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleBreakOut() {
-    setLoading(true);
-    try {
-      await fetch('/api/time-tracking/break-out', { method: 'POST' });
-      await fetchToday();
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (!entry?.isClockedIn) {
+  // Done for the day
+  if (!entry.isClockedIn && entry.id) {
+    const worked = entry.totalMinutes ?? 0;
     return (
-      <div className="bg-white rounded-lg p-6 border border-gray-200 max-w-md">
-        <h2 className="text-lg font-bold mb-4">My Timing</h2>
-        <button
-          onClick={handleClockIn}
-          disabled={loading}
-          className="w-full btn-primary py-3 font-bold rounded-lg"
-        >
-          CLOCK IN
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white rounded-lg p-6 border border-gray-200 max-w-md">
-      <h2 className="text-lg font-bold mb-4">My Timing</h2>
-
-      {/* Time Display Box */}
-      <div className="border-2 border-gray-300 rounded-lg p-4 mb-4">
-        <div className="flex items-center gap-4">
-          {/* Current Time */}
-          <div className="flex-1">
-            <p className="text-xs text-gray-600 uppercase tracking-wide mb-2">Current Time</p>
-            <p className="text-3xl font-bold" style={{ color: '#22c55e' }}>
-              {currentTime}
-            </p>
-          </div>
-
-          {/* Separator */}
-          <div className="h-16 w-1" style={{ background: '#fbbf24' }}></div>
-
-          {/* Break Time */}
-          <div className="flex-1">
-            <div className="flex items-center gap-1 mb-2">
-              <p className="text-xs text-gray-600 uppercase tracking-wide">Break Time</p>
-              <Info size={14} className="text-gray-400" />
-            </div>
-            <p className="text-3xl font-bold" style={{ color: '#ef4444' }}>
-              {breakTime}
+      <div className="card flex items-center justify-between gap-4 p-5">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "var(--good-soft)", color: "var(--good)" }}>
+            <Clock size={16} />
+          </span>
+          <div>
+            <p className="text-sm font-semibold">Done for today</p>
+            <p className="text-xs text-ink-2">
+              You worked {Math.floor(worked / 60)}h {worked % 60}m — see you tomorrow!
             </p>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Buttons */}
-      <div className="flex gap-3">
-        {!onBreak ? (
-          <button
-            onClick={handleBreakIn}
-            disabled={loading}
-            className="flex-1 py-3 font-bold rounded-lg border-2"
-            style={{ borderColor: '#ef4444', color: '#ef4444', background: 'white' }}
-          >
-            BREAK
+  // Not clocked in yet
+  if (!entry.isClockedIn) {
+    return (
+      <div className="card flex flex-wrap items-center justify-between gap-4 p-5">
+        <div>
+          <p className="text-sm font-semibold">My Timing</p>
+          <p className="text-xs text-ink-2">Clock in to start tracking your day</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {error && <p className="text-xs font-medium" style={{ color: "var(--critical)" }}>{error}</p>}
+          <button onClick={() => action("clock-in")} disabled={loading} className="btn-primary px-5 py-2 text-sm disabled:opacity-60">
+            <Play size={14} /> Clock in
           </button>
-        ) : (
-          <button
-            onClick={handleBreakOut}
-            disabled={loading}
-            className="flex-1 py-3 font-bold rounded-lg border-2"
-            style={{ borderColor: '#ef4444', color: '#ef4444', background: 'white' }}
-          >
-            BACK
-          </button>
-        )}
-        <button
-          onClick={handleClockOut}
-          disabled={loading}
-          className="flex-1 py-3 font-bold rounded-lg"
-          style={{ background: '#ef4444', color: 'white' }}
-        >
-          CLOCK OUT
-        </button>
+        </div>
       </div>
+    );
+  }
+
+  // Clocked in — live timers
+  return (
+    <div className="card p-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-6">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-3">Working time</p>
+            <p className="mt-0.5 text-2xl font-bold tabular" style={{ color: "var(--good)" }}>{workTime}</p>
+          </div>
+          <div className="h-10 w-px bg-line" style={{ background: "var(--line)" }} />
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-3">Break time</p>
+            <p className="mt-0.5 text-2xl font-bold tabular" style={{ color: onBreak ? "var(--critical)" : "var(--ink-3)" }}>{breakTime}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          {error && <p className="text-xs font-medium" style={{ color: "var(--critical)" }}>{error}</p>}
+          <button
+            onClick={() => action(onBreak ? "break-out" : "break-in")}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-semibold transition disabled:opacity-60"
+            style={{ borderColor: "var(--warn)", color: "var(--warn)" }}
+          >
+            <Coffee size={14} /> {onBreak ? "Back to work" : "Take a break"}
+          </button>
+          <button
+            onClick={() => action("clock-out")}
+            disabled={loading || onBreak}
+            title={onBreak ? "End your break before clocking out" : undefined}
+            className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white transition disabled:opacity-60"
+            style={{ background: "var(--critical)" }}
+          >
+            <LogOut size={14} /> Clock out
+          </button>
+        </div>
+      </div>
+      {onBreak && (
+        <p className="mt-3 rounded-lg px-3 py-1.5 text-xs font-medium" style={{ background: "var(--warn-soft)", color: "var(--warn)" }}>
+          You're on a break — the work timer is paused.
+        </p>
+      )}
     </div>
   );
 }
