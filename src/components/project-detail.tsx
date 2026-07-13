@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Plus, KanbanSquare, List, GanttChartSquare, CalendarDays } from "lucide-react";
 import { Card, RiskBadge, PriorityBadge, StatusPill, Avatar, Progress } from "@/components/ui";
 import { TaskModal } from "@/components/task-modal";
+import { TaskDetail } from "@/components/task-detail";
 import { statusMeta, riskMeta, type Status, type Priority, type RiskLevel } from "@/lib/data";
 
 const COLUMNS: Status[] = ["backlog", "todo", "in_progress", "in_review", "done"];
@@ -24,12 +25,13 @@ type Project = {
   tasks: Task[];
 };
 
-function TaskCard({ t, onDragStart }: { t: Task; onDragStart: (e: React.DragEvent, id: string) => void }) {
+function TaskCard({ t, onDragStart, onOpen }: { t: Task; onDragStart: (e: React.DragEvent, id: string) => void; onOpen: (t: Task) => void }) {
   return (
     <motion.div
       layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       draggable
       onDragStart={(e) => onDragStart(e as unknown as React.DragEvent, t.id)}
+      onClick={() => onOpen(t)}
       className="cursor-grab rounded-xl border border-line bg-surface p-3 shadow-sm transition hover:border-line-strong hover:shadow-md active:cursor-grabbing"
     >
       <div className="flex items-center justify-between gap-2">
@@ -64,6 +66,7 @@ export function ProjectDetail({ project }: { project: Project }) {
   const [dragOver, setDragOver] = useState<Status | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState<string>("backlog");
+  const [selected, setSelected] = useState<Task | null>(null);
 
   // Keep local state in sync when the server refreshes the page data
   useEffect(() => setItems(project.tasks), [project.tasks]);
@@ -111,6 +114,7 @@ export function ProjectDetail({ project }: { project: Project }) {
   return (
     <div className="mx-auto max-w-7xl space-y-5">
       <TaskModal projectId={project.id} open={modalOpen} initialStatus={modalStatus} onClose={() => setModalOpen(false)} />
+      {selected && <TaskDetail task={selected} onClose={() => setSelected(null)} />}
 
       <div className="float-up flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -180,7 +184,7 @@ export function ProjectDetail({ project }: { project: Project }) {
                     outlineOffset: -2,
                   }}
                 >
-                  {colTasks.map((t) => <TaskCard key={t.id} t={t} onDragStart={onDragStart} />)}
+                  {colTasks.map((t) => <TaskCard key={t.id} t={t} onDragStart={onDragStart} onOpen={setSelected} />)}
                   <button onClick={() => openModal(col)}
                     className="w-full rounded-xl border border-dashed border-line-strong py-2 text-xs font-medium text-ink-3 transition hover:text-ink">
                     + Add task
@@ -208,7 +212,7 @@ export function ProjectDetail({ project }: { project: Project }) {
             </thead>
             <tbody className="divide-y divide-line">
               {items.map((t) => (
-                <tr key={t.id} className="transition hover:bg-surface-2">
+                <tr key={t.id} onClick={() => setSelected(t)} className="cursor-pointer transition hover:bg-surface-2">
                   <td className="px-4 py-3 text-xs font-semibold text-ink-3 tabular">{t.key}</td>
                   <td className="px-4 py-3 font-medium">{t.title}</td>
                   <td className="px-4 py-3"><StatusPill s={t.status as Status} /></td>
