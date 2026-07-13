@@ -7,10 +7,18 @@ import { Plus, KanbanSquare, List, GanttChartSquare, CalendarDays } from "lucide
 import { Card, RiskBadge, PriorityBadge, StatusPill, Avatar, Progress } from "@/components/ui";
 import { TaskModal } from "@/components/task-modal";
 import { TaskDetail } from "@/components/task-detail";
+import { AddKanbanColumn } from "@/components/add-kanban-column";
 import { statusMeta, riskMeta, type Status, type Priority, type RiskLevel } from "@/lib/data";
 
-const COLUMNS: Status[] = ["backlog", "todo", "in_progress", "in_review", "done"];
 type View = "board" | "list" | "timeline" | "calendar";
+type ProjectStatus = { id: string; name: string; color: string; order: number };
+const DEFAULT_STATUSES = [
+  { id: "1", name: "Backlog", color: "var(--ink-3)", order: 0 },
+  { id: "2", name: "Todo", color: "var(--warn)", order: 1 },
+  { id: "3", name: "In Progress", color: "var(--brand)", order: 2 },
+  { id: "4", name: "In Review", color: "var(--warn-soft)", order: 3 },
+  { id: "5", name: "Done", color: "var(--good)", order: 4 },
+];
 
 type Assignee = { id: string; name: string; initials: string; color: string } | null;
 type Task = {
@@ -63,10 +71,19 @@ export function ProjectDetail({ project }: { project: Project }) {
   const router = useRouter();
   const [items, setItems] = useState<Task[]>(project.tasks);
   const [view, setView] = useState<View>("board");
-  const [dragOver, setDragOver] = useState<Status | null>(null);
+  const [statuses, setStatuses] = useState<ProjectStatus[]>(DEFAULT_STATUSES);
+  const [dragOver, setDragOver] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalStatus, setModalStatus] = useState<string>("backlog");
+  const [modalStatus, setModalStatus] = useState<string>("Backlog");
   const [selected, setSelected] = useState<Task | null>(null);
+
+  // Fetch project statuses
+  useEffect(() => {
+    fetch(`/api/projects/${project.id}/statuses`)
+      .then((r) => (r.ok ? r.json() : DEFAULT_STATUSES))
+      .then((d) => setStatuses(Array.isArray(d) && d.length > 0 ? d : DEFAULT_STATUSES))
+      .catch(() => setStatuses(DEFAULT_STATUSES));
+  }, [project.id]);
 
   // Keep local state in sync when the server refreshes the page data
   useEffect(() => setItems(project.tasks), [project.tasks]);
@@ -76,7 +93,7 @@ export function ProjectDetail({ project }: { project: Project }) {
     e.dataTransfer.effectAllowed = "move";
   };
 
-  const onDrop = async (e: React.DragEvent, col: Status) => {
+  const onDrop = async (e: React.DragEvent, col: string) => {
     e.preventDefault();
     setDragOver(null);
     const id = e.dataTransfer.getData("text/task-id");
@@ -90,7 +107,7 @@ export function ProjectDetail({ project }: { project: Project }) {
     const res = await fetch(`/api/tasks/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: col }),
+      body: JSON.stringify({ status: col.toLowerCase().replace(/ /g, "_") }),
     });
     if (!res.ok) {
       setItems(previous); // roll back on failure
@@ -163,28 +180,28 @@ export function ProjectDetail({ project }: { project: Project }) {
 
       {view === "board" && (
         <div className="hide-scrollbar -mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
-          {COLUMNS.map((col) => {
-            const colTasks = items.filter((t) => t.status === col);
+          {statuses.map((status) => {
+            const colTasks = items.filter((t) => t.status.toLowerCase() === status.name.toLowerCase().replace(/ /g, "_"));
             return (
-              <div key={col} className="w-64 shrink-0">
+              <div key={status.id} className="min-w-72 shrink-0">
                 <div className="mb-2.5 flex items-center gap-2 px-1">
-                  <span className="h-2 w-2 rounded-full" style={{ background: statusMeta[col].color }} />
-                  <span className="text-xs font-semibold text-ink-2">{statusMeta[col].label}</span>
+                  <span className="h-2 w-2 rounded-full" style={{ background: status.color }} />
+                  <span className="text-xs font-semibold text-ink-2">{status.name}</span>
                   <span className="text-xs text-ink-3 tabular">{colTasks.length}</span>
                 </div>
                 <div
-                  onDragOver={(e) => { e.preventDefault(); setDragOver(col); }}
-                  onDragLeave={() => setDragOver((d) => (d === col ? null : d))}
-                  onDrop={(e) => onDrop(e, col)}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(status.name); }}
+                  onDragLeave={() => setDragOver((d) => (d === status.name ? null : d))}
+                  onDrop={(e) => onDrop(e, status.name)}
                   className="space-y-2.5 rounded-2xl p-2.5 min-h-24 transition"
                   style={{
-                    background: dragOver === col ? "var(--brand-soft)" : "var(--surface-2)",
-                    outline: dragOver === col ? "2px dashed var(--brand)" : "none",
+                    background: dragOver === status.name ? "var(--brand-soft)" : "var(--surface-2)",
+                    outline: dragOver === status.name ? "2px dashed var(--brand)" : "none",
                     outlineOffset: -2,
                   }}
                 >
                   {colTasks.map((t) => <TaskCard key={t.id} t={t} onDragStart={onDragStart} onOpen={setSelected} />)}
-                  <button onClick={() => openModal(col)}
+                  <button onClick={() => openModal(status.name)}
                     className="w-full rounded-xl border border-dashed border-line-strong py-2 text-xs font-medium text-ink-3 transition hover:text-ink">
                     + Add task
                   </button>
@@ -192,6 +209,7 @@ export function ProjectDetail({ project }: { project: Project }) {
               </div>
             );
           })}
+          <AddKanbanColumn projectId={project.id} onAdded={() => router.refresh()} />
         </div>
       )}
 

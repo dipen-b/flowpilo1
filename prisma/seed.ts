@@ -55,6 +55,14 @@ async function main() {
   ];
 
   const projects: Record<string, string> = {};
+  const defaultStatuses = [
+    { name: "Backlog", color: "var(--ink-3)" },
+    { name: "Todo", color: "var(--warn)" },
+    { name: "In Progress", color: "var(--brand)" },
+    { name: "In Review", color: "var(--warn-soft)" },
+    { name: "Done", color: "var(--good)" },
+  ];
+
   for (let i = 0; i < projectSeed.length; i++) {
     const p = projectSeed[i];
     const proj = await db.project.create({
@@ -64,6 +72,13 @@ async function main() {
       },
     });
     projects[`p${i + 1}`] = proj.id;
+
+    // Create default statuses for this project
+    for (let j = 0; j < defaultStatuses.length; j++) {
+      await db.projectStatus.create({
+        data: { projectId: proj.id, ...defaultStatuses[j], order: j },
+      });
+    }
   }
 
   // Active sprint (matches the "Sprint 14" widget in the sidebar)
