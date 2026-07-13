@@ -24,6 +24,18 @@ export const POST = requireUser(async (req: NextRequest, context: SessionContext
     }
 
     const clockOutTime = new Date();
+
+    // Auto-close any break still open so it counts as break time, not work time
+    const openBreak = timeEntry.breaks.find((b) => !b.breakOutTime);
+    if (openBreak) {
+      const durationMinutes = Math.floor((clockOutTime.getTime() - openBreak.breakInTime.getTime()) / 60000);
+      await db.break.update({
+        where: { id: openBreak.id },
+        data: { breakOutTime: clockOutTime, durationMinutes },
+      });
+      openBreak.breakOutTime = clockOutTime;
+    }
+
     const totalTime = clockOutTime.getTime() - timeEntry.clockInTime.getTime();
     const breakTime = timeEntry.breaks.reduce((sum, b) => {
       if (b.breakOutTime) {

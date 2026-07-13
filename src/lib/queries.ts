@@ -66,7 +66,7 @@ export async function getMembers(orgId: string) {
     const load = orgItems.reduce((sum, t) => sum + (t.status !== "done" ? t.estimate : 0), 0);
     const over = load > u.capacity;
     return {
-      id: u.id, name: u.name, initials: u.initials, role: u.role, color: u.color,
+      id: u.id, name: u.name, email: u.email, initials: u.initials, role: u.role, color: u.color,
       capacity: u.capacity, load,
       burnoutRisk: over ? "critical" : load > u.capacity * 0.95 ? "warning" : "good",
     };

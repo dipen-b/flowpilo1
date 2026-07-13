@@ -39,10 +39,20 @@ export const POST = requireUser(async (req: NextRequest, context: SessionContext
     const body = await req.json();
     const { date, status, checkInTime, checkOutTime, notes, userId } = body;
 
+    if (!date) {
+      return NextResponse.json({ error: "Date is required" }, { status: 400 });
+    }
+
     // Only admin/owner can create for others
     const targetUserId = userId || context.user.id;
-    if (userId && !["owner", "admin"].includes(context.user.role)) {
+    if (userId && userId !== context.user.id && !["owner", "admin"].includes(context.user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    // Target user must belong to the same organization
+    const targetUser = await db.user.findUnique({ where: { id: targetUserId } });
+    if (!targetUser || targetUser.orgId !== context.orgId) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Calculate work hours if both times provided

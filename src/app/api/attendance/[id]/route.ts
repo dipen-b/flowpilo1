@@ -9,10 +9,11 @@ export const GET = requireUser(async (req: NextRequest, context: SessionContext,
   try {
     const record = await db.attendance.findUnique({
       where: { id },
-      include: { user: { select: { id: true, name: true, email: true, role: true } } },
+      include: { user: { select: { id: true, name: true, email: true, role: true, orgId: true } } },
     });
 
-    if (!record) {
+    // Record must exist and belong to this org
+    if (!record || record.user.orgId !== context.orgId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
@@ -32,14 +33,18 @@ export const PATCH = requireUser(async (req: NextRequest, context: SessionContex
   const body = await req.json();
 
   try {
-    const record = await db.attendance.findUnique({ where: { id } });
+    const record = await db.attendance.findUnique({
+      where: { id },
+      include: { user: { select: { orgId: true } } },
+    });
 
-    if (!record) {
+    // Record must exist and belong to this org
+    if (!record || record.user.orgId !== context.orgId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // Check access: can only edit own or if admin/owner
-    if (record.userId !== context.user.id && !["owner", "admin"].includes(context.user.role)) {
+    // Only admins/owners can edit attendance records
+    if (!["owner", "admin"].includes(context.user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 

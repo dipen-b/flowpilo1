@@ -1,5 +1,5 @@
-import { UserPlus } from "lucide-react";
 import { Card, Avatar, Progress, RiskBadge, Stat } from "@/components/ui";
+import { InviteMember } from "@/components/invite-member";
 import { Sparkline } from "@/components/charts";
 import { type RiskLevel } from "@/lib/data";
 import { getMembers } from "@/lib/queries";
@@ -36,7 +36,7 @@ export default async function Team() {
           <h1 className="text-2xl font-bold tracking-tight">Team</h1>
           <p className="mt-1 text-sm text-ink-2">Product Engineering · {members.length} members</p>
         </div>
-        <button className="btn-primary px-4 py-2 text-sm"><UserPlus size={14} /> Invite member</button>
+        {["owner", "admin"].includes(session.user.role) && <InviteMember />}
       </div>
 
       <div className="grid gap-5 sm:grid-cols-3">
