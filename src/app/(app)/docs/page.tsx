@@ -30,8 +30,7 @@ export default function Docs() {
           <h1 className="text-2xl font-bold tracking-tight">Docs</h1>
           <p className="mt-1 text-sm text-ink-2">Keep specs, release notes, and reports next to the work they describe</p>
         </div>
-        <button className="btn-primary px-4 py-2 text-sm"><Plus size={14} /> New doc</button>
-      </div>
+        </div>
 
       <div>
         <p className="mb-3 text-sm font-semibold text-ink-2">Start from a template</p>
@@ -57,7 +56,7 @@ export default function Docs() {
 
       <Card title="Recent documents">
         <ul className="divide-y divide-line">
-          {[...created.map((t) => ({ title: t, when: "Just now", by: "Dipen B" })), ...RECENT].map((d, i) => (
+          {[...created.map((t) => ({ title: t, when: "Just now", by: "You" })), ...RECENT].map((d, i) => (
             <li key={d.title + i} className="flex flex-wrap items-center gap-3 py-3">
               <FileText size={15} className="text-ink-3" />
               <span className="min-w-0 flex-1 truncate text-sm font-medium">{d.title}</span>

@@ -1,4 +1,4 @@
-import { Download, FileText } from "lucide-react";
+import { Download } from "lucide-react";
 import { Card, Stat, RiskBadge, Progress } from "@/components/ui";
 import { VelocityBars, Sparkline, HealthRing } from "@/components/charts";
 import { velocity, riskMeta, type RiskLevel } from "@/lib/data";
@@ -23,12 +23,9 @@ export default async function Analytics() {
       <div className="float-up flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>
-          <p className="mt-1 text-sm text-ink-2">Portfolio visibility · live from database</p>
+          <p className="mt-1 text-sm text-ink-2">Portfolio visibility across all projects</p>
         </div>
-        <div className="flex gap-2">
-          <button className="btn-ghost px-4 py-2 text-sm"><Download size={14} /> Export CSV</button>
-          <button className="btn-primary px-4 py-2 text-sm"><FileText size={14} /> Report</button>
-        </div>
+        <a href="/api/export" download className="btn-primary px-4 py-2 text-sm"><Download size={14} /> Export CSV</a>
       </div>
 
       {/* Portfolio summary */}
