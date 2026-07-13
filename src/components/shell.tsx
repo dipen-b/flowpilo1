@@ -7,6 +7,7 @@ import {
   LayoutDashboard, FolderKanban, Timer, Users, BarChart3, FileText,
   Zap, Settings, Compass, Sun, Moon, Search, Bell, Menu, X, LogOut,
 } from "lucide-react";
+import { CommandPalette, useCommandPalette } from "@/components/command-palette";
 
 export interface ShellUser {
   id: string;
@@ -62,6 +63,7 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { open: paletteOpen, setOpen: setPaletteOpen } = useCommandPalette();
 
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -123,11 +125,12 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
           <button className="md:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
             <Menu size={18} />
           </button>
-          <div className="hidden max-w-md flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-ink-3 sm:flex">
+          <button onClick={() => setPaletteOpen(true)}
+            className="hidden max-w-md flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-ink-3 transition hover:border-line-strong sm:flex">
             <Search size={14} />
             <span className="text-xs">Search projects, tasks, people…</span>
             <kbd className="ml-auto rounded border border-line bg-surface-2 px-1.5 text-[10px] font-medium">⌘K</kbd>
-          </div>
+          </button>
           <div className="ml-auto flex items-center gap-2.5">
             <button className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-line text-ink-2 hover:bg-surface-2" aria-label="Notifications">
               <Bell size={15} />
@@ -157,6 +160,7 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
         </header>
         <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
       </div>
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );
 }
