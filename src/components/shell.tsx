@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, FolderKanban, Timer, Users, BarChart3, FileText,
-  Zap, Settings, Compass, Sun, Moon, Search, Bell, Menu, X, LogOut,
+  Zap, Settings, Compass, Sun, Moon, Search, Bell, Menu, X, LogOut, Calendar,
 } from "lucide-react";
 import { CommandPalette, useCommandPalette } from "@/components/command-palette";
 
@@ -20,6 +20,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/projects", label: "Projects", icon: FolderKanban },
   { href: "/sprints", label: "Sprints", icon: Timer },
+  { href: "/attendance", label: "Attendance", icon: Calendar },
   { href: "/team", label: "Team", icon: Users },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/docs", label: "Docs", icon: FileText },

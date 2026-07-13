@@ -1,18 +1,25 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getTasks } from "@/lib/queries";
+import { requireUser } from "@/lib/route-guard";
+import { SessionContext } from "@/lib/auth";
 
-export async function GET() {
-  return NextResponse.json(await getTasks());
-}
+export const GET = requireUser(async (req: NextRequest, context: SessionContext) => {
+  return NextResponse.json(await getTasks(context.orgId));
+});
 
-export async function POST(request: Request) {
-  const body = await request.json();
+export const POST = requireUser(async (req: NextRequest, context: SessionContext) => {
+  const body = await req.json();
   if (!body.projectId || !body.title) {
     return NextResponse.json({ error: "projectId and title are required" }, { status: 400 });
   }
-  const project = await db.project.findUnique({ where: { id: body.projectId } });
-  if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  const project = await db.project.findUnique({
+    where: { id: body.projectId },
+    include: { workspace: true },
+  });
+  if (!project || project.workspace.orgId !== context.orgId) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
 
   const count = await db.workItem.count({ where: { projectId: project.id } });
   const item = await db.workItem.create({
@@ -30,4 +37,4 @@ export async function POST(request: Request) {
     },
   });
   return NextResponse.json(item, { status: 201 });
-}
+});

@@ -1,14 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getProjects } from "@/lib/queries";
+import { requireUser } from "@/lib/route-guard";
+import { SessionContext } from "@/lib/auth";
 
-export async function GET() {
-  return NextResponse.json(await getProjects());
-}
+export const GET = requireUser(async (req: NextRequest, context: SessionContext) => {
+  return NextResponse.json(await getProjects(context.orgId));
+});
 
-export async function POST(request: Request) {
-  const body = await request.json();
-  const workspace = await db.workspace.findFirst();
+export const POST = requireUser(async (req: NextRequest, context: SessionContext) => {
+  const body = await req.json();
+  const workspace = await db.workspace.findFirst({ where: { orgId: context.orgId } });
   if (!workspace) return NextResponse.json({ error: "No workspace" }, { status: 400 });
 
   const project = await db.project.create({
@@ -22,4 +24,4 @@ export async function POST(request: Request) {
     },
   });
   return NextResponse.json(project, { status: 201 });
-}
+});

@@ -2,13 +2,13 @@ import Link from "next/link";
 import { AlertTriangle, CalendarDays, FolderKanban } from "lucide-react";
 import { Card, RiskBadge, PriorityBadge, Progress, Stat, Avatar } from "@/components/ui";
 import { HealthRing, Sparkline, Burndown, WorkloadHeatmap } from "@/components/charts";
+import { MyTiming } from "@/components/my-timing";
 import { burndown, riskMeta, type RiskLevel, type Priority } from "@/lib/data";
 import { getDashboard, getTasks, getActiveSprint } from "@/lib/queries";
 import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-/** Spread a weekly load across Mon–Fri for the heatmap. */
 function spreadLoad(load: number): number[] {
   const base = Math.floor(load / 5);
   const rem = load % 5;
@@ -16,13 +16,16 @@ function spreadLoad(load: number): number[] {
 }
 
 export default async function Dashboard() {
-  const [{ projects, members, risks, activity, healthAvg }, tasks, sprint, user] = await Promise.all([
-    getDashboard(),
-    getTasks(),
-    getActiveSprint(),
-    getSessionUser(),
+  const session = await getSessionUser();
+  if (!session) {
+    return <div>Unauthorized</div>;
+  }
+  const [{ projects, members, risks, activity, healthAvg }, tasks, sprint] = await Promise.all([
+    getDashboard(session.orgId),
+    getTasks(session.orgId),
+    getActiveSprint(session.orgId),
   ]);
-  const firstName = user?.name.split(" ")[0] ?? "there";
+  const firstName = session.user.name.split(" ")[0] ?? "there";
 
   const focus = tasks.filter((t) => ["urgent", "high"].includes(t.priority) && t.status !== "done").slice(0, 4);
   const deadlines = tasks.filter((t) => t.status !== "done").slice(0, 5);
@@ -46,6 +49,11 @@ export default async function Dashboard() {
           <button className="btn-ghost px-4 py-2 text-sm"><CalendarDays size={14} /> This week</button>
           <Link href="/projects" className="btn-primary px-4 py-2 text-sm"><FolderKanban size={14} /> Go to projects</Link>
         </div>
+      </div>
+
+      {/* My Timing Widget */}
+      <div className="float-up">
+        <MyTiming />
       </div>
 
       {/* Score row */}

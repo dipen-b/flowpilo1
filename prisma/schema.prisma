@@ -17,6 +17,8 @@ model Organization {
   workspaces Workspace[]
   members    Membership[]
   users      User[]
+  activity   ActivityLog[]
+  invites    Invite[]
 }
 
 model Workspace {
@@ -44,6 +46,10 @@ model User {
   assignedItems WorkItem[]  @relation("Assignee")
   ledProjects  Project[]    @relation("Lead")
   comments     Comment[]
+  invitesCreated Invite[]   @relation("InviteCreator")
+  notifications Notification[]
+  timeEntries TimeEntry[]
+  attendances Attendance[]
   createdAt    DateTime     @default(now())
 }
 
@@ -152,9 +158,90 @@ model AiInsight {
   createdAt DateTime @default(now())
 }
 
+model Invite {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email     String
+  token     String   @unique
+  role      String   @default("member")
+  createdBy String
+  creator   User     @relation("InviteCreator", fields: [createdBy], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([orgId])
+  @@index([email])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   @default("info") // info | warning | success | task_assigned | comment | invite
+  title     String
+  message   String
+  actionUrl String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
 model ActivityLog {
   id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   who       String
   what      String
   createdAt DateTime @default(now())
+}
+
+model TimeEntry {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          String    // YYYY-MM-DD
+  clockInTime   DateTime
+  clockOutTime  DateTime?
+  totalMinutes  Int       @default(0) // excluding breaks
+  breaks        Break[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([date])
+  @@unique([userId, date])
+}
+
+model Break {
+  id            String    @id @default(cuid())
+  timeEntryId   String
+  timeEntry     TimeEntry @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
+  breakInTime   DateTime
+  breakOutTime  DateTime?
+  durationMinutes Int     @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([timeEntryId])
+}
+
+model Attendance {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          String   // YYYY-MM-DD
+  status        String   @default("absent") // present | absent | leave | half-day | late
+  checkInTime   DateTime?
+  checkOutTime  DateTime?
+  workHours     Int      @default(0) // in minutes
+  notes         String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
 }

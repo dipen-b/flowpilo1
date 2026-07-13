@@ -3,11 +3,14 @@ import { Card, Stat, RiskBadge, Progress } from "@/components/ui";
 import { VelocityBars, Sparkline, HealthRing } from "@/components/charts";
 import { velocity, riskMeta, type RiskLevel } from "@/lib/data";
 import { getProjects, getInsights } from "@/lib/queries";
+import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function Analytics() {
-  const [projects, insights] = await Promise.all([getProjects(), getInsights()]);
+  const session = await getSessionUser();
+  if (!session) return <div>Unauthorized</div>;
+  const [projects, insights] = await Promise.all([getProjects(session.orgId), getInsights(session.orgId)]);
   const healthAvg = Math.round(projects.reduce((s, p) => s + p.health, 0) / (projects.length || 1));
   const onTrack = projects.filter((p) => p.risk === "good").length;
   const criticalCount = insights.filter((i) => i.level === "critical").length;
