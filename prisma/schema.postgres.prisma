@@ -1,0 +1,261 @@
+// FlowPilot database schema — POSTGRES variant for production deploys.
+// Keep models in sync with schema.prisma (SQLite, local dev).
+// Multi-tenant: Organization -> Workspace -> Project -> WorkItem, with Sprints, Members, Comments, Activity, and AI insights.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id         String       @id @default(cuid())
+  name       String
+  plan       String       @default("pro") // free | pro | enterprise
+  createdAt  DateTime     @default(now())
+  workspaces Workspace[]
+  members    Membership[]
+  users      User[]
+  activity   ActivityLog[]
+  invites    Invite[]
+}
+
+model Workspace {
+  id       String    @id @default(cuid())
+  name     String
+  orgId    String
+  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  projects Project[]
+  createdAt DateTime  @default(now())
+}
+
+model User {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  passwordHash String       @default("")
+  initials     String
+  role         String       @default("member") // owner | admin | member | guest
+  color        String       @default("#6366f1")
+  capacity     Int          @default(40)
+  orgId        String
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  memberships  Membership[]
+  sessions     Session[]
+  assignedItems WorkItem[]  @relation("Assignee")
+  ledProjects  Project[]    @relation("Lead")
+  comments     Comment[]
+  invitesCreated Invite[]   @relation("InviteCreator")
+  notifications Notification[]
+  timeEntries TimeEntry[]
+  attendances Attendance[]
+  createdAt    DateTime     @default(now())
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Membership {
+  id     String @id @default(cuid())
+  userId String
+  orgId  String
+  role   String @default("member")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  key         String
+  emoji       String    @default("📁")
+  health      Int       @default(75)
+  risk        String    @default("good") // good | warning | serious | critical
+  progress    Int       @default(0)
+  dueDate     String?
+  summary     String    @default("")
+  forecastDate String?
+  forecastConfidence Int @default(80)
+  forecastDelta String  @default("")
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  leadId      String?
+  lead        User?     @relation("Lead", fields: [leadId], references: [id])
+  workItems   WorkItem[]
+  sprints     Sprint[]
+  insights    AiInsight[]
+  statuses    ProjectStatus[]
+  createdAt   DateTime  @default(now())
+}
+
+model ProjectStatus {
+  id        String  @id @default(cuid())
+  name      String
+  color     String  @default("var(--ink-3)") // CSS color variable
+  order     Int     @default(0)
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, name])
+}
+
+model WorkItem {
+  id         String   @id @default(cuid())
+  key        String
+  type       String   @default("task") // epic | story | task | subtask
+  title      String
+  description String  @default("")
+  status     String   @default("backlog") // backlog | todo | in_progress | in_review | done
+  priority   String   @default("medium") // urgent | high | medium | low
+  labels     String   @default("") // comma-separated
+  estimate   Int      @default(0)
+  spent      Int      @default(0)
+  dueDate    String?
+  aiFlag     String?
+  parentId   String?
+  parent     WorkItem? @relation("SubItems", fields: [parentId], references: [id])
+  children   WorkItem[] @relation("SubItems")
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assigneeId String?
+  assignee   User?    @relation("Assignee", fields: [assigneeId], references: [id])
+  sprintId   String?
+  sprint     Sprint?  @relation(fields: [sprintId], references: [id])
+  comments   Comment[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Sprint {
+  id        String   @id @default(cuid())
+  name      String
+  goal      String   @default("")
+  status    String   @default("active") // planned | active | completed
+  startDate String?
+  endDate   String?
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items     WorkItem[]
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  body       String
+  workItemId String
+  workItem   WorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model AiInsight {
+  id        String   @id @default(cuid())
+  level     String   @default("warning") // good | warning | serious | critical
+  kind      String   @default("risk") // risk | recommendation | prediction
+  title     String
+  detail    String   @default("")
+  action    String   @default("")
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Invite {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  email     String
+  token     String   @unique
+  role      String   @default("member")
+  createdBy String
+  creator   User     @relation("InviteCreator", fields: [createdBy], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([orgId])
+  @@index([email])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   @default("info") // info | warning | success | task_assigned | comment | invite
+  title     String
+  message   String
+  actionUrl String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  who       String
+  what      String
+  createdAt DateTime @default(now())
+}
+
+model TimeEntry {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          String    // YYYY-MM-DD
+  clockInTime   DateTime
+  clockOutTime  DateTime?
+  totalMinutes  Int       @default(0) // excluding breaks
+  breaks        Break[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([date])
+  @@unique([userId, date])
+}
+
+model Break {
+  id            String    @id @default(cuid())
+  timeEntryId   String
+  timeEntry     TimeEntry @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
+  breakInTime   DateTime
+  breakOutTime  DateTime?
+  durationMinutes Int     @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([timeEntryId])
+}
+
+model Attendance {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          String   // YYYY-MM-DD
+  status        String   @default("absent") // present | absent | leave | half-day | late
+  checkInTime   DateTime?
+  checkOutTime  DateTime?
+  workHours     Int      @default(0) // in minutes
+  notes         String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}

@@ -4,6 +4,16 @@ import { hashPassword } from "../src/lib/password";
 const DEMO_PASSWORD = "flowpilot123";
 
 async function main() {
+  // On deploys, only seed an empty database — never wipe live data.
+  // Locally (or with FORCE_SEED=1) always reseed from scratch.
+  if (process.env.SEED_IF_EMPTY === "1" && !process.env.FORCE_SEED) {
+    const existing = await db.organization.count();
+    if (existing > 0) {
+      console.log("Database already has data — skipping seed.");
+      return;
+    }
+  }
+
   // Clean DB (FK-safe order; user/org deletes cascade sessions, attendance, time entries, etc.)
   await db.invite.deleteMany({}); // invites restrict user deletes via createdBy
   await db.comment.deleteMany({});
