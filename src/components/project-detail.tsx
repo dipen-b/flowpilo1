@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, KanbanSquare, List, GanttChartSquare, CalendarDays } from "lucide-react";
@@ -12,6 +12,9 @@ import { statusMeta, riskMeta, type Status, type Priority, type RiskLevel } from
 
 type View = "board" | "list" | "timeline" | "calendar";
 type ProjectStatus = { id: string; name: string; color: string; order: number };
+
+/** "In Progress" -> "in_progress" — how column names map to stored status values */
+const slug = (name: string) => name.trim().toLowerCase().replace(/\s+/g, "_");
 const DEFAULT_STATUSES = [
   { id: "1", name: "Backlog", color: "var(--ink-3)", order: 0 },
   { id: "2", name: "Todo", color: "var(--warn)", order: 1 },
@@ -74,16 +77,18 @@ export function ProjectDetail({ project }: { project: Project }) {
   const [statuses, setStatuses] = useState<ProjectStatus[]>(DEFAULT_STATUSES);
   const [dragOver, setDragOver] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalStatus, setModalStatus] = useState<string>("Backlog");
+  const [modalStatus, setModalStatus] = useState<string>("backlog");
   const [selected, setSelected] = useState<Task | null>(null);
 
-  // Fetch project statuses
-  useEffect(() => {
+  // Fetch project statuses (also re-run after a column is added)
+  const loadStatuses = useCallback(() => {
     fetch(`/api/projects/${project.id}/statuses`)
       .then((r) => (r.ok ? r.json() : DEFAULT_STATUSES))
       .then((d) => setStatuses(Array.isArray(d) && d.length > 0 ? d : DEFAULT_STATUSES))
       .catch(() => setStatuses(DEFAULT_STATUSES));
   }, [project.id]);
+
+  useEffect(() => loadStatuses(), [loadStatuses]);
 
   // Keep local state in sync when the server refreshes the page data
   useEffect(() => setItems(project.tasks), [project.tasks]);
@@ -107,7 +112,7 @@ export function ProjectDetail({ project }: { project: Project }) {
     const res = await fetch(`/api/tasks/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: col.toLowerCase().replace(/ /g, "_") }),
+      body: JSON.stringify({ status: col }),
     });
     if (!res.ok) {
       setItems(previous); // roll back on failure
@@ -130,8 +135,12 @@ export function ProjectDetail({ project }: { project: Project }) {
 
   return (
     <div className="mx-auto max-w-7xl space-y-5">
-      <TaskModal projectId={project.id} open={modalOpen} initialStatus={modalStatus} onClose={() => setModalOpen(false)} />
-      {selected && <TaskDetail task={selected} onClose={() => setSelected(null)} />}
+      <TaskModal projectId={project.id} open={modalOpen} initialStatus={modalStatus}
+        statuses={statuses.map((s) => ({ value: slug(s.name), label: s.name }))}
+        onClose={() => setModalOpen(false)} />
+      {selected && <TaskDetail task={selected}
+        statuses={statuses.map((s) => ({ value: slug(s.name), label: s.name }))}
+        onClose={() => setSelected(null)} />}
 
       <div className="float-up flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -181,7 +190,8 @@ export function ProjectDetail({ project }: { project: Project }) {
       {view === "board" && (
         <div className="hide-scrollbar -mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
           {statuses.map((status) => {
-            const colTasks = items.filter((t) => t.status.toLowerCase() === status.name.toLowerCase().replace(/ /g, "_"));
+            const col = slug(status.name);
+            const colTasks = items.filter((t) => t.status === col);
             return (
               <div key={status.id} className="min-w-72 shrink-0">
                 <div className="mb-2.5 flex items-center gap-2 px-1">
@@ -190,18 +200,18 @@ export function ProjectDetail({ project }: { project: Project }) {
                   <span className="text-xs text-ink-3 tabular">{colTasks.length}</span>
                 </div>
                 <div
-                  onDragOver={(e) => { e.preventDefault(); setDragOver(status.name); }}
-                  onDragLeave={() => setDragOver((d) => (d === status.name ? null : d))}
-                  onDrop={(e) => onDrop(e, status.name)}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(col); }}
+                  onDragLeave={() => setDragOver((d) => (d === col ? null : d))}
+                  onDrop={(e) => onDrop(e, col)}
                   className="space-y-2.5 rounded-2xl p-2.5 min-h-24 transition"
                   style={{
-                    background: dragOver === status.name ? "var(--brand-soft)" : "var(--surface-2)",
-                    outline: dragOver === status.name ? "2px dashed var(--brand)" : "none",
+                    background: dragOver === col ? "var(--brand-soft)" : "var(--surface-2)",
+                    outline: dragOver === col ? "2px dashed var(--brand)" : "none",
                     outlineOffset: -2,
                   }}
                 >
                   {colTasks.map((t) => <TaskCard key={t.id} t={t} onDragStart={onDragStart} onOpen={setSelected} />)}
-                  <button onClick={() => openModal(status.name)}
+                  <button onClick={() => openModal(col)}
                     className="w-full rounded-xl border border-dashed border-line-strong py-2 text-xs font-medium text-ink-3 transition hover:text-ink">
                     + Add task
                   </button>
@@ -209,7 +219,7 @@ export function ProjectDetail({ project }: { project: Project }) {
               </div>
             );
           })}
-          <AddKanbanColumn projectId={project.id} onAdded={() => router.refresh()} />
+          <AddKanbanColumn projectId={project.id} onAdded={loadStatuses} />
         </div>
       )}
 

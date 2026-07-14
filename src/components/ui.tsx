@@ -41,8 +41,12 @@ export function PriorityBadge({ p }: { p: Priority }) {
   );
 }
 
-export function StatusPill({ s }: { s: Status }) {
-  const m = statusMeta[s];
+export function StatusPill({ s }: { s: Status | string }) {
+  // Custom board columns produce statuses beyond the built-in five
+  const m = statusMeta[s as Status] ?? {
+    label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    color: "var(--ink-3)",
+  };
   return (
     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-2">
       <span className="h-2 w-2 rounded-full" style={{ background: m.color }} />

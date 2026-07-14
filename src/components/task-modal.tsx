@@ -19,13 +19,16 @@ export function TaskModal({
   projectId,
   open,
   initialStatus = "backlog",
+  statuses,
   onClose,
 }: {
   projectId: string;
   open: boolean;
   initialStatus?: string;
+  statuses?: { value: string; label: string }[];
   onClose: () => void;
 }) {
+  const statusOptions = statuses?.length ? statuses : STATUSES;
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("medium");
@@ -110,7 +113,7 @@ export function TaskModal({
                 <label className="block text-xs font-semibold text-ink-2">Status</label>
                 <select value={status} onChange={(e) => setStatus(e.target.value)}
                   className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-sm outline-none focus:border-brand">
-                  {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  {statusOptions.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                 </select>
               </div>
               <div>
