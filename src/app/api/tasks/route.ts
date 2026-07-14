@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getTasks } from "@/lib/queries";
 import { requireUser } from "@/lib/route-guard";
 import { SessionContext } from "@/lib/auth";
+import { runAutomations } from "@/lib/automations";
 
 export const GET = requireUser(async (req: NextRequest, context: SessionContext) => {
   return NextResponse.json(await getTasks(context.orgId));
@@ -36,5 +37,13 @@ export const POST = requireUser(async (req: NextRequest, context: SessionContext
       assigneeId: body.assigneeId ?? null,
     },
   });
+
+  const ctx = {
+    taskId: item.id, taskKey: item.key, taskTitle: item.title,
+    assigneeId: item.assigneeId, projectId: project.id, actorName: context.user.name,
+  };
+  await runAutomations(context.orgId, "task_created", ctx);
+  if (item.priority === "urgent") await runAutomations(context.orgId, "task_urgent", ctx);
+
   return NextResponse.json(item, { status: 201 });
 });
