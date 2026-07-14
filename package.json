@@ -11,7 +11,7 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
-    "build:vercel": "PRISMA_SCHEMA=prisma/schema.postgres.prisma prisma generate && PRISMA_SCHEMA=prisma/schema.postgres.prisma prisma db push --skip-generate --accept-data-loss && SEED_IF_EMPTY=1 tsx prisma/seed.ts && next build"
+    "build:vercel": "PRISMA_SCHEMA=prisma/schema.postgres.prisma prisma generate && PRISMA_SCHEMA=prisma/schema.postgres.prisma prisma db push --accept-data-loss && SEED_IF_EMPTY=1 tsx prisma/seed.ts && next build"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.8.0",
