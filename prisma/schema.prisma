@@ -19,6 +19,7 @@ model Organization {
   users      User[]
   activity   ActivityLog[]
   invites    Invite[]
+  automations AutomationRule[]
 }
 
 model Workspace {
@@ -257,4 +258,17 @@ model Attendance {
   @@unique([userId, date])
   @@index([userId])
   @@index([date])
+}
+
+model AutomationRule {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  trigger   String   // task_created | task_urgent | task_done
+  action    String   // notify_admins | notify_assignee | log_activity
+  enabled   Boolean  @default(true)
+  runs      Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([orgId, trigger])
 }

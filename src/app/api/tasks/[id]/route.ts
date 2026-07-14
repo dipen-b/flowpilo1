@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/route-guard";
 import { SessionContext } from "@/lib/auth";
 import { createNotification } from "@/lib/notifications";
+import { runAutomations } from "@/lib/automations";
 
 const ALLOWED = ["title", "status", "priority", "estimate", "spent", "dueDate", "assigneeId", "sprintId"] as const;
 
@@ -36,7 +37,19 @@ export const PATCH = requireUser(async (req: NextRequest, context: SessionContex
         `/projects/${item.projectId}`
       );
     }
-    
+
+    // Fire automations on meaningful transitions
+    const ctx = {
+      taskId: updated.id, taskKey: updated.key, taskTitle: updated.title,
+      assigneeId: updated.assigneeId, projectId: updated.projectId, actorName: context.user.name,
+    };
+    if (updated.status === "done" && item.status !== "done") {
+      await runAutomations(context.orgId, "task_done", ctx);
+    }
+    if (updated.priority === "urgent" && item.priority !== "urgent") {
+      await runAutomations(context.orgId, "task_urgent", ctx);
+    }
+
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

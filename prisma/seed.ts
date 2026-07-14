@@ -16,6 +16,7 @@ async function main() {
 
   // Clean DB (FK-safe order; user/org deletes cascade sessions, attendance, time entries, etc.)
   await db.invite.deleteMany({}); // invites restrict user deletes via createdBy
+  await db.automationRule.deleteMany({});
   await db.comment.deleteMany({});
   await db.workItem.deleteMany({});
   await db.sprint.deleteMany({});
@@ -33,6 +34,10 @@ async function main() {
   const workspace = await db.workspace.create({
     data: { name: "Product Workspace", orgId: org.id },
   });
+
+  // Default automation rules — live from day one
+  await db.automationRule.create({ data: { orgId: org.id, trigger: "task_urgent", action: "notify_admins" } });
+  await db.automationRule.create({ data: { orgId: org.id, trigger: "task_done", action: "log_activity" } });
 
   const passwordHash = hashPassword(DEMO_PASSWORD);
 
