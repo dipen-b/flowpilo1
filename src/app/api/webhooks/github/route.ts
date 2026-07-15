@@ -1,14 +1,36 @@
+import { createHmac } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+
+/** Verify GitHub webhook signature to prevent spoofed requests. */
+function verifyGitHubSignature(body: string, signature: string): boolean {
+  const secret = process.env.GITHUB_WEBHOOK_SECRET;
+  if (!secret) return false; // Must be configured
+
+  const hmac = createHmac("sha256", secret);
+  const digest = "sha256=" + hmac.update(body).digest("hex");
+  return digest === signature;
+}
 
 /** GitHub webhook: auto-update tasks based on commit messages.
     Configure in GitHub repo settings: https://github.com/OWNER/REPO/settings/hooks
     Webhook URL: https://yourdomain.com/api/webhooks/github
     Events: Pushes
+    Secret: set GITHUB_WEBHOOK_SECRET env var and paste it in GitHub webhook settings
  */
 export async function POST(req: NextRequest) {
   try {
-    const payload = await req.json();
+    const signature = req.headers.get("x-hub-signature-256");
+    if (!signature) {
+      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+    }
+
+    const body = await req.text();
+    if (!verifyGitHubSignature(body, signature)) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    const payload = JSON.parse(body);
 
     // Only process push events
     if (payload.action && payload.action !== "push" && !payload.ref) {
