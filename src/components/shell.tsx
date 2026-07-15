@@ -30,6 +30,7 @@ const NAV = [
   { href: "/sprints", label: "Sprints", icon: Timer },
   { href: "/attendance", label: "Attendance", icon: Calendar },
   { href: "/team", label: "Team", icon: Users },
+  { href: "/integrations", label: "Integrations", icon: Compass },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/docs", label: "Docs", icon: FileText },
   { href: "/automations", label: "Automations", icon: Zap },
