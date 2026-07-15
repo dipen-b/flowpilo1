@@ -26,6 +26,7 @@ export interface ShellSprint {
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/projects", label: "Projects", icon: FolderKanban },
+  { href: "/search", label: "Search", icon: Search },
   { href: "/sprints", label: "Sprints", icon: Timer },
   { href: "/attendance", label: "Attendance", icon: Calendar },
   { href: "/team", label: "Team", icon: Users },
