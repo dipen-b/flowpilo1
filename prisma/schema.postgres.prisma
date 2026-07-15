@@ -18,6 +18,7 @@ model Organization {
   workspaces Workspace[]
   members    Membership[]
   users      User[]
+  githubIntegrations GitHubIntegration[]
   activity   ActivityLog[]
   invites    Invite[]
   automations AutomationRule[]
@@ -53,6 +54,7 @@ model User {
   timeEntries TimeEntry[]
   attendances Attendance[]
   passwordResets PasswordReset[]
+  githubIntegrations GitHubIntegration[]
   createdAt    DateTime     @default(now())
 }
 
@@ -282,4 +284,18 @@ model PasswordReset {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+}
+
+model GitHubIntegration {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orgId         String
+  org           Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  githubUsername String
+  accessToken   String   // in production, encrypt this
+  createdAt     DateTime @default(now())
+
+  @@unique([userId, orgId])
+  @@index([orgId])
 }
