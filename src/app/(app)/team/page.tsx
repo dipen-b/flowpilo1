@@ -1,5 +1,6 @@
 import { Card, Avatar, Progress, RiskBadge, Stat } from "@/components/ui";
 import { InviteMember } from "@/components/invite-member";
+import { ResetLinkButton } from "@/components/reset-link-button";
 import { Sparkline } from "@/components/charts";
 import { type RiskLevel } from "@/lib/data";
 import { getMembers } from "@/lib/queries";
@@ -61,6 +62,7 @@ export default async function Team() {
               <th className="px-5 py-3 font-medium">Workload</th>
               <th className="px-5 py-3 font-medium">Productivity trend</th>
               <th className="px-5 py-3 font-medium">Load status</th>
+              {["owner", "admin"].includes(session.user.role) && <th className="px-5 py-3" />}
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
@@ -85,6 +87,9 @@ export default async function Team() {
                   </td>
                   <td className="px-5 py-3.5"><Sparkline data={trendFor(i)} color={pct <= 100 ? "var(--series-2)" : "var(--series-3)"} width={110} height={30} /></td>
                   <td className="px-5 py-3.5"><RiskBadge level={m.burnoutRisk as RiskLevel} /></td>
+                  {["owner", "admin"].includes(session.user.role) && (
+                    <td className="px-5 py-3.5 text-right"><ResetLinkButton userId={m.id} userName={m.name} /></td>
+                  )}
                 </tr>
               );
             })}

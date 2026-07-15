@@ -52,6 +52,7 @@ model User {
   notifications Notification[]
   timeEntries TimeEntry[]
   attendances Attendance[]
+  passwordResets PasswordReset[]
   createdAt    DateTime     @default(now())
 }
 
@@ -272,4 +273,13 @@ model AutomationRule {
   createdAt DateTime @default(now())
 
   @@index([orgId, trigger])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
