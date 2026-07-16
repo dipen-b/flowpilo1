@@ -7,6 +7,7 @@ export interface Accent {
 }
 
 export const ACCENTS: Accent[] = [
+  { name: "amber", label: "Amber", brand: "#eab308", brand2: "#ca9a04", soft: "rgba(234, 179, 8, 0.16)" },
   { name: "teal", label: "Teal", brand: "#14b8a6", brand2: "#0d9488", soft: "rgba(20, 184, 166, 0.12)" },
   { name: "blue", label: "Blue", brand: "#3b82f6", brand2: "#2563eb", soft: "rgba(59, 130, 246, 0.12)" },
   { name: "indigo", label: "Indigo", brand: "#4f46e5", brand2: "#4338ca", soft: "rgba(79, 70, 229, 0.12)" },
