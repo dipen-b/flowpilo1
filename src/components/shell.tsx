@@ -72,6 +72,7 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { open: paletteOpen, setOpen: setPaletteOpen } = useCommandPalette();
 
@@ -81,18 +82,19 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
     router.refresh();
   };
 
-  const nav = (
+  const nav = (showLabels: boolean) => (
     <nav className="flex flex-col gap-1 px-3">
       {NAV.map(({ href, label, icon: Icon }) => {
         const active = pathname.startsWith(href);
         return (
-          <Link key={href} href={href}
+          <Link key={href} href={href} onClick={() => setMobileOpen(false)}
+            title={label}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 group ${
               active ? "bg-brand text-white shadow-md" : "text-ink-2 hover:text-ink hover:bg-surface-2"
-            }`}>
+            } ${!showLabels ? "justify-center" : ""}`}>
             <Icon size={18} />
-            <span className={`flex-1 ${!sidebarOpen ? "hidden" : ""}`}>{label}</span>
-            {active && sidebarOpen && <ChevronRight size={16} className="opacity-50" />}
+            {showLabels && <span className="flex-1">{label}</span>}
+            {active && showLabels && <ChevronRight size={16} className="opacity-50" />}
           </Link>
         );
       })}
@@ -116,7 +118,7 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
           </button>
         </div>
 
-        {nav}
+        {nav(sidebarOpen)}
 
         {sprint && sidebarOpen && (
           <div className="mt-auto p-4 border-t border-line">
@@ -134,17 +136,17 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
       </aside>
 
       {/* Mobile Floating Sidebar */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-20 md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
           <aside className="absolute left-0 top-0 h-full w-64 bg-surface border-r border-line float-up flex flex-col">
             <div className="flex items-center justify-between px-5 py-6">
               <Logo />
-              <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">
+              <button onClick={() => setMobileOpen(false)} aria-label="Close sidebar" className="p-1.5 hover:bg-surface-2 rounded-lg transition">
                 <X size={18} />
               </button>
             </div>
-            {nav}
+            {nav(true)}
           </aside>
         </div>
       )}
@@ -153,7 +155,7 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
       <div className={`flex flex-1 flex-col transition-all duration-300 ${sidebarOpen ? "md:ml-56" : "md:ml-20"}`}>
         {/* Header */}
         <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface px-4 md:px-6">
-          <button className="md:hidden p-1 hover:bg-surface-2 rounded-lg transition" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
+          <button className="md:hidden p-1 hover:bg-surface-2 rounded-lg transition" onClick={() => setMobileOpen(true)} aria-label="Open menu">
             <Menu size={20} />
           </button>
 
