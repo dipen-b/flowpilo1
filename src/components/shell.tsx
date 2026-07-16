@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard, FolderKanban, Timer, Users, BarChart3, FileText,
   Zap, Settings, Compass, Sun, Moon, Search, Menu, X, LogOut, Calendar,
+  ChevronRight,
 } from "lucide-react";
 import { CommandPalette, useCommandPalette } from "@/components/command-palette";
 import { NotificationsBell } from "@/components/notifications-bell";
@@ -50,20 +51,19 @@ export function ThemeToggle() {
   };
   return (
     <button onClick={toggle} aria-label="Toggle theme"
-      className="flex h-8 w-8 items-center justify-center rounded-lg border border-line text-ink-2 transition hover:bg-surface-2">
-      {dark ? <Sun size={15} /> : <Moon size={15} />}
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-ink-3 hover:text-ink-2 transition hover:bg-surface-2 hover:border-brand">
+      {dark ? <Sun size={16} /> : <Moon size={16} />}
     </button>
   );
 }
 
-export function Logo({ size = 15 }: { size?: number }) {
+export function Logo({ size = 16 }: { size?: number }) {
   return (
-    <Link href="/" className="flex items-center gap-2 font-bold tracking-tight">
-      <span className="flex h-7 w-7 items-center justify-center rounded-lg text-white"
-        style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}>
+    <Link href="/" className="flex items-center gap-2.5 font-bold text-lg tracking-tight hover:opacity-80 transition">
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{ background: "var(--brand)" }}>
         <Compass size={size} />
       </span>
-      FlowPilot
+      <span className="hidden sm:inline text-ink">FlowPilot</span>
     </Link>
   );
 }
@@ -71,7 +71,7 @@ export function Logo({ size = 15 }: { size?: number }) {
 export function AppShell({ children, user, sprint }: { children: React.ReactNode; user: ShellUser; sprint?: ShellSprint | null }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const { open: paletteOpen, setOpen: setPaletteOpen } = useCommandPalette();
 
@@ -82,17 +82,17 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
   };
 
   const nav = (
-    <nav className="flex flex-col gap-0.5 px-3">
+    <nav className="flex flex-col gap-1 px-3">
       {NAV.map(({ href, label, icon: Icon }) => {
         const active = pathname.startsWith(href);
         return (
-          <Link key={href} href={href} onClick={() => setMobileOpen(false)}
-            className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition ${
-              active ? "text-ink" : "text-ink-2 hover:bg-surface-2 hover:text-ink"
-            }`}
-            style={active ? { background: "var(--brand-soft)", color: "var(--brand)" } : undefined}>
-            <Icon size={16} />
-            {label}
+          <Link key={href} href={href}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 group ${
+              active ? "bg-brand text-white shadow-md" : "text-ink-2 hover:text-ink hover:bg-surface-2"
+            }`}>
+            <Icon size={18} />
+            <span className={`flex-1 ${!sidebarOpen ? "hidden" : ""}`}>{label}</span>
+            {active && sidebarOpen && <ChevronRight size={16} className="opacity-50" />}
           </Link>
         );
       })}
@@ -100,77 +100,101 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
   );
 
   return (
-    <div className="flex min-h-screen w-full">
-      {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-line bg-surface md:flex">
-        <div className="px-5 py-5"><Logo /></div>
+    <div className="flex min-h-screen w-full bg-bg">
+      {/* Desktop Floating Sidebar */}
+      <aside className={`hidden md:flex fixed left-0 top-0 h-screen flex-col transition-all duration-300 ${
+        sidebarOpen ? "w-64 md:w-56" : "w-20"
+      } bg-surface border-r border-line z-30 flex-col overflow-hidden`}>
+        <div className={`flex items-center justify-between px-4 py-6 ${!sidebarOpen ? "flex-col gap-3" : ""}`}>
+          {sidebarOpen && <Logo />}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-1.5 hover:bg-surface-2 rounded-lg transition"
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <Menu size={18} />
+          </button>
+        </div>
+
         {nav}
-        {sprint && (
-          <div className="mt-auto p-4">
-            <div className="rounded-xl border border-line p-3">
-              <p className="text-xs font-semibold">{sprint.name}</p>
-              <p className="mt-1 text-[11px] text-ink-2">
-                {sprint.daysLeft !== null ? `${sprint.daysLeft} days left · ` : ""}{sprint.progress}% complete
+
+        {sprint && sidebarOpen && (
+          <div className="mt-auto p-4 border-t border-line">
+            <div className="rounded-lg border border-line bg-surface-2 p-3 hover:border-brand transition">
+              <p className="text-xs font-semibold text-ink">{sprint.name}</p>
+              <p className="mt-2 text-xs text-ink-2">
+                {sprint.daysLeft !== null ? `${sprint.daysLeft}d • ` : ""}<span className="font-medium">{sprint.progress}%</span>
               </p>
-              <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-2">
-                <div className="h-full rounded-full" style={{ width: `${sprint.progress}%`, background: "var(--brand)" }} />
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-border">
+                <div className="h-full transition-all duration-700" style={{ width: `${sprint.progress}%`, background: "var(--brand)" }} />
               </div>
             </div>
           </div>
         )}
       </aside>
 
-      {/* Mobile drawer */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-64 border-r border-line bg-surface pt-4 float-up">
-            <div className="mb-4 flex items-center justify-between px-5">
+      {/* Mobile Floating Sidebar */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-20 md:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute left-0 top-0 h-full w-64 bg-surface border-r border-line float-up flex flex-col">
+            <div className="flex items-center justify-between px-5 py-6">
               <Logo />
-              <button onClick={() => setMobileOpen(false)} aria-label="Close menu"><X size={18} /></button>
+              <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">
+                <X size={18} />
+              </button>
             </div>
             {nav}
           </aside>
         </div>
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="glass sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line px-4 md:px-6">
-          <button className="md:hidden" onClick={() => setMobileOpen(true)} aria-label="Open menu">
-            <Menu size={18} />
+      {/* Main Content */}
+      <div className={`flex flex-1 flex-col transition-all duration-300 ${sidebarOpen ? "md:ml-56" : "md:ml-20"}`}>
+        {/* Header */}
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface px-4 md:px-6">
+          <button className="md:hidden p-1 hover:bg-surface-2 rounded-lg transition" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
+            <Menu size={20} />
           </button>
+
           <button onClick={() => setPaletteOpen(true)}
-            className="hidden max-w-md flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-ink-3 transition hover:border-line-strong sm:flex">
-            <Search size={14} />
-            <span className="text-xs">Search projects, tasks, people…</span>
-            <kbd className="ml-auto rounded border border-line bg-surface-2 px-1.5 text-[10px] font-medium">⌘K</kbd>
+            className="hidden max-w-md flex-1 items-center gap-2.5 rounded-lg border border-line bg-surface px-3.5 py-2 text-ink-3 transition hover:border-brand hover:bg-surface-2 sm:flex">
+            <Search size={16} />
+            <span className="text-sm">Search projects, tasks, people…</span>
+            <kbd className="ml-auto rounded border border-line bg-surface-2 px-2 py-0.5 text-xs font-medium">⌘K</kbd>
           </button>
-          <div className="ml-auto flex items-center gap-2.5">
+
+          <div className="ml-auto flex items-center gap-3">
             <NotificationsBell />
             <ThemeToggle />
             <div className="relative">
               <button
                 onClick={() => setMenuOpen((o) => !o)}
                 title={user.name}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white hover:opacity-80 transition"
                 style={{ background: user.color }}
               >
                 {user.initials}
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border border-line bg-surface p-1.5 shadow-lg float-up">
-                  <p className="px-3 py-2 text-xs font-semibold">{user.name}</p>
+                <div className="absolute right-0 top-12 z-50 w-48 rounded-lg border border-line bg-surface shadow-lg float-up overflow-hidden">
+                  <p className="px-4 py-3 text-sm font-semibold text-ink border-b border-line">{user.name}</p>
                   <button onClick={logout}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] font-medium text-ink-2 transition hover:bg-surface-2 hover:text-ink">
-                    <LogOut size={14} /> Log out
+                    className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-ink-2 hover:text-critical hover:bg-critical/5 transition">
+                    <LogOut size={16} /> Log out
                   </button>
                 </div>
               )}
             </div>
           </div>
         </header>
-        <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          {children}
+        </main>
       </div>
+
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );
