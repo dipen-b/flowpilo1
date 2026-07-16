@@ -3,17 +3,19 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --bg: #fffdf5;
-  --surface: #ffffff;
-  --surface-2: #fdf6e3;
-  --border: rgba(20, 18, 12, 0.14);
-  --border-strong: rgba(20, 18, 12, 0.26);
-  --ink: #14120c;
-  --ink-2: #3a352a;
-  --ink-3: #7a725f;
-  --brand: #eab308;
-  --brand-2: #ca9a04;
-  --brand-soft: rgba(234, 179, 8, 0.16);
+  /* Warm, low-strain light theme — soft paper background, no pure white,
+     soft charcoal text instead of black, muted gold accent. */
+  --bg: #f5f2ea;
+  --surface: #fbf9f3;
+  --surface-2: #ece7db;
+  --border: rgba(60, 50, 28, 0.12);
+  --border-strong: rgba(60, 50, 28, 0.2);
+  --ink: #33302a;
+  --ink-2: #5c584e;
+  --ink-3: #8d8778;
+  --brand: #c19a2e;
+  --brand-2: #a5811f;
+  --brand-soft: rgba(193, 154, 46, 0.14);
   --good: #10b981;
   --warn: #f59e0b;
   --serious: #dc2626;
@@ -32,17 +34,19 @@
 }
 
 .dark {
-  --bg: #0a0a08;
-  --surface: #161511;
-  --surface-2: #211f18;
-  --border: rgba(234, 179, 8, 0.18);
-  --border-strong: rgba(234, 179, 8, 0.32);
-  --ink: #fdf6e3;
-  --ink-2: #d8d0b8;
-  --ink-3: #9a927a;
-  --brand: #facc15;
-  --brand-2: #fde047;
-  --brand-soft: rgba(250, 204, 21, 0.16);
+  /* Soft charcoal — not pure black — with a warm off-white ink and a
+     gentle gold accent. Avoids glare/halation for long sessions. */
+  --bg: #1a1815;
+  --surface: #24211b;
+  --surface-2: #2e2a21;
+  --border: rgba(224, 200, 140, 0.12);
+  --border-strong: rgba(224, 200, 140, 0.22);
+  --ink: #e6e1d3;
+  --ink-2: #bcb6a5;
+  --ink-3: #8a8573;
+  --brand: #dcb652;
+  --brand-2: #e8c96a;
+  --brand-soft: rgba(220, 182, 82, 0.14);
   --good: #34d399;
   --warn: #fbbf24;
   --serious: #fb923c;
