@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "FlowPilot helps teams plan projects, run sprints, and track work with boards, timelines, and analytics that are fast to set up and a pleasure to use.",
 };
 
-const themeInit = `(function(){try{var t=localStorage.getItem('fp-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`;
+const themeInit = `(function(){try{var t=localStorage.getItem('fp-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}var a=localStorage.getItem('fp-accent');if(a){var c=JSON.parse(a);var s=document.documentElement.style;s.setProperty('--brand',c.brand);s.setProperty('--brand-2',c.brand2);s.setProperty('--brand-soft',c.soft)}}catch(e){}})()`;
 
 export default function RootLayout({
   children,
