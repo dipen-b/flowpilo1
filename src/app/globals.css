@@ -3,17 +3,17 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --bg: #faf6ef;
+  --bg: #fffdf5;
   --surface: #ffffff;
-  --surface-2: #f4ede1;
-  --border: rgba(64, 53, 34, 0.12);
-  --border-strong: rgba(64, 53, 34, 0.22);
-  --ink: #1f1c17;
-  --ink-2: #4a453c;
-  --ink-3: #8a8375;
-  --brand: #10b981;
-  --brand-2: #059669;
-  --brand-soft: rgba(16, 185, 129, 0.12);
+  --surface-2: #fdf6e3;
+  --border: rgba(20, 18, 12, 0.14);
+  --border-strong: rgba(20, 18, 12, 0.26);
+  --ink: #14120c;
+  --ink-2: #3a352a;
+  --ink-3: #7a725f;
+  --brand: #eab308;
+  --brand-2: #ca9a04;
+  --brand-soft: rgba(234, 179, 8, 0.16);
   --good: #10b981;
   --warn: #f59e0b;
   --serious: #dc2626;
@@ -32,17 +32,17 @@
 }
 
 .dark {
-  --bg: #131210;
-  --surface: #1e1c19;
-  --surface-2: #2a2723;
-  --border: rgba(255, 245, 220, 0.12);
-  --border-strong: rgba(255, 245, 220, 0.22);
-  --ink: #f5f1e8;
-  --ink-2: #cfc9bc;
-  --ink-3: #99927f;
-  --brand: #10b981;
-  --brand-2: #34d399;
-  --brand-soft: rgba(16, 185, 129, 0.15);
+  --bg: #0a0a08;
+  --surface: #161511;
+  --surface-2: #211f18;
+  --border: rgba(234, 179, 8, 0.18);
+  --border-strong: rgba(234, 179, 8, 0.32);
+  --ink: #fdf6e3;
+  --ink-2: #d8d0b8;
+  --ink-3: #9a927a;
+  --brand: #facc15;
+  --brand-2: #fde047;
+  --brand-soft: rgba(250, 204, 21, 0.16);
   --good: #34d399;
   --warn: #fbbf24;
   --serious: #fb923c;

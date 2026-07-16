@@ -60,8 +60,8 @@ export function ThemeToggle() {
 
 export function AccentPicker() {
   const [open, setOpen] = useState(false);
-  const [current, setCurrent] = useState("green");
-  const [customHex, setCustomHex] = useState("#10b981");
+  const [current, setCurrent] = useState("amber");
+  const [customHex, setCustomHex] = useState("#eab308");
   useEffect(() => {
     try {
       const saved = localStorage.getItem("fp-accent-name");
