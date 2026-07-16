@@ -150,83 +150,117 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
     router.refresh();
   };
 
+  const navList = (
+    <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
+      {NAV.map(({ href, label, icon: Icon }) => {
+        const active = pathname.startsWith(href);
+        return (
+          <Link key={href} href={href} onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 ${
+              active ? "text-white shadow-md" : "text-ink-2 hover:bg-surface-2 hover:text-ink"
+            }`}
+            style={active ? { background: "var(--brand)" } : undefined}>
+            <Icon size={18} />
+            {label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
+  const sprintCard = sprint && (
+    <div className="p-3">
+      <div className="rounded-xl border border-line bg-surface-2 p-3.5" title={`${sprint.name} — ${sprint.progress}% complete`}>
+        <p className="text-xs font-semibold text-ink">{sprint.name}</p>
+        <p className="mt-1.5 text-xs text-ink-2">
+          {sprint.daysLeft !== null ? `${sprint.daysLeft} days left · ` : ""}
+          <span className="font-medium">{sprint.progress}%</span> complete
+        </p>
+        <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-border">
+          <div className="h-full rounded-full transition-all duration-700"
+            style={{ width: `${sprint.progress}%`, background: "var(--brand)" }} />
+        </div>
+      </div>
+    </div>
+  );
+
+  const sidebarInner = (
+    <>
+      <div className="flex items-center justify-between px-5 pt-5 pb-4">
+        <Logo size={18} />
+        <button onClick={() => setMobileOpen(false)} aria-label="Close menu"
+          className="rounded-lg p-1.5 text-ink-3 transition hover:bg-surface-2 hover:text-ink md:hidden">
+          <X size={18} />
+        </button>
+      </div>
+      <button onClick={() => setPaletteOpen(true)} aria-label="Search"
+        className="mx-3 mb-3 flex h-9 items-center gap-2 rounded-full border border-line bg-surface-2 px-3.5 text-ink-3 transition hover:border-brand hover:text-ink-2">
+        <Search size={15} />
+        <span className="text-sm">Jump to…</span>
+        <kbd className="ml-auto rounded border border-line bg-surface px-1.5 text-xs">⌘K</kbd>
+      </button>
+      {navList}
+      {sprintCard}
+    </>
+  );
+
   return (
     <div className="min-h-screen w-full bg-bg">
-      {/* Basecamp-style centered header */}
-      <header className="relative pt-5">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4">
-          <button onClick={() => setPaletteOpen(true)} aria-label="Search"
-            className="flex h-9 items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-ink-3 transition hover:border-brand hover:text-ink-2">
-            <Search size={15} />
-            <span className="hidden text-sm sm:inline">Jump to…</span>
-            <kbd className="hidden rounded border border-line bg-surface-2 px-1.5 text-xs sm:inline">⌘K</kbd>
-          </button>
+      {/* Floating sidebar (desktop) */}
+      <aside className="fixed bottom-4 left-4 top-4 z-30 hidden w-64 flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-lg md:flex">
+        {sidebarInner}
+      </aside>
 
-          <div className="absolute left-1/2 -translate-x-1/2">
-            <Logo size={18} />
-          </div>
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+          <aside className="float-up absolute bottom-4 left-4 top-4 flex w-64 flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-lg">
+            {sidebarInner}
+          </aside>
+        </div>
+      )}
 
-          <div className="flex items-center gap-2">
-            <NotificationsBell />
-            <AccentPicker />
-            <ThemeToggle />
-            <div className="relative">
-              <button
-                onClick={() => setMenuOpen((o) => !o)}
-                title={user.name}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white hover:opacity-80 transition"
-                style={{ background: user.color }}
-              >
-                {user.initials}
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 top-12 z-50 w-48 rounded-2xl border border-line bg-surface shadow-lg float-up overflow-hidden">
-                  <p className="px-4 py-3 text-sm font-semibold text-ink border-b border-line">{user.name}</p>
-                  <button onClick={logout}
-                    className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-ink-2 hover:text-critical hover:bg-critical/5 transition">
-                    <LogOut size={16} /> Log out
-                  </button>
-                </div>
-              )}
-            </div>
+      {/* Top bar with menu toggle + actions */}
+      <header className="flex items-center gap-3 px-4 pt-5 md:ml-72 md:pr-6">
+        <button onClick={() => setMobileOpen(true)} aria-label="Open menu"
+          className="rounded-lg p-1.5 text-ink-2 transition hover:bg-surface-2 md:hidden">
+          <Menu size={20} />
+        </button>
+        <div className="md:hidden">
+          <Logo size={18} />
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <NotificationsBell />
+          <AccentPicker />
+          <ThemeToggle />
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen((o) => !o)}
+              title={user.name}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white hover:opacity-80 transition"
+              style={{ background: user.color }}
+            >
+              {user.initials}
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-12 z-50 w-48 rounded-2xl border border-line bg-surface shadow-lg float-up overflow-hidden">
+                <p className="px-4 py-3 text-sm font-semibold text-ink border-b border-line">{user.name}</p>
+                <button onClick={logout}
+                  className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-ink-2 hover:text-critical hover:bg-critical/5 transition">
+                  <LogOut size={16} /> Log out
+                </button>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Centered pill nav */}
-        <nav className="hide-scrollbar mx-auto mt-5 flex max-w-5xl items-center gap-2 overflow-x-auto px-4 pb-1 md:flex-wrap md:justify-center md:overflow-visible">
-          {NAV.map(({ href, label, icon: Icon }) => {
-            const active = pathname.startsWith(href);
-            return (
-              <Link key={href} href={href}
-                className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
-                  active
-                    ? "border-transparent text-white shadow-md"
-                    : "border-line bg-surface text-ink-2 hover:border-brand hover:text-ink"
-                }`}
-                style={active ? { background: "var(--brand)" } : undefined}>
-                <Icon size={15} />
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {sprint && (
-          <div className="mx-auto mt-3 flex max-w-5xl items-center justify-center gap-2.5 px-4"
-            title={`${sprint.name} — ${sprint.progress}% complete`}>
-            <span className="text-xs font-semibold text-ink-3">{sprint.name}</span>
-            <div className="h-1.5 w-28 overflow-hidden rounded-full bg-border">
-              <div className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${sprint.progress}%`, background: "var(--brand)" }} />
-            </div>
-            <span className="tabular text-xs font-medium text-ink-3">{sprint.progress}%</span>
-          </div>
-        )}
       </header>
 
-      {/* Page content — centered column like Basecamp */}
-      <main className="mx-auto w-full max-w-5xl px-4 py-6 md:py-8">
-        {children}
+      {/* Page content — offset for the sidebar, centered column inside */}
+      <main className="px-4 py-6 md:pl-72 md:pr-6 md:py-8">
+        <div className="mx-auto w-full max-w-5xl">
+          {children}
+        </div>
       </main>
 
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
