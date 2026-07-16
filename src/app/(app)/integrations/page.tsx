@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Code2, CheckCircle, AlertCircle, X } from "lucide-react";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui";
 
 interface Integration {
@@ -42,22 +43,31 @@ export default function IntegrationsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
-      <div className="float-up">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}>
         <h1 className="text-2xl font-bold tracking-tight">Integrations</h1>
         <p className="mt-1 text-sm text-ink-2">Connect external services to automate your workflow</p>
-      </div>
+      </motion.div>
 
       {(success === "github_connected" || message === "github_connected") && (
-        <div className="rounded-xl px-4 py-3 text-sm font-medium" style={{ background: "var(--good-soft)", color: "var(--good)" }}>
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl px-4 py-3 text-sm font-medium shadow-sm transition-all duration-200" style={{ background: "var(--good-soft)", color: "var(--good)" }}>
           <CheckCircle size={16} className="mr-2 inline" />
           GitHub connected successfully! Webhooks are now ready to use.
-        </div>
+        </motion.div>
       )}
       {error && (
-        <div className="rounded-xl px-4 py-3 text-sm font-medium" style={{ background: "var(--critical-soft)", color: "var(--critical)" }}>
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl px-4 py-3 text-sm font-medium shadow-sm transition-all duration-200" style={{ background: "var(--critical-soft)", color: "var(--critical)" }}>
           <AlertCircle size={16} className="mr-2 inline" />
           Connection failed: {error}
-        </div>
+        </motion.div>
       )}
 
       <Card title="GitHub">

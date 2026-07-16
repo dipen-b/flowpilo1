@@ -8,9 +8,9 @@ export interface AvatarPerson {
   color: string;
 }
 
-export function Card({ children, className = "", title, action }: { children: React.ReactNode; className?: string; title?: string; action?: React.ReactNode }) {
+export function Card({ children, className = "", title, action, hover = false }: { children: React.ReactNode; className?: string; title?: string; action?: React.ReactNode; hover?: boolean }) {
   return (
-    <section className={`card p-5 ${className}`}>
+    <section className={`card p-5 transition-all duration-200 ${hover ? "hover:shadow-lg hover:border-line-strong" : ""} ${className}`}>
       {(title || action) && (
         <header className="mb-4 flex items-center justify-between gap-2">
           {title && <h3 className="text-sm font-semibold text-ink-2 tracking-wide">{title}</h3>}
@@ -80,7 +80,7 @@ export function AvatarStack({ people, size = 26 }: { people: AvatarPerson[]; siz
 export function Progress({ value, color = "var(--brand)" }: { value: number; color?: string }) {
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
-      <div className="h-full rounded-full transition-all duration-700" style={{ width: `${value}%`, background: color }} />
+      <div className="h-full rounded-full transition-all duration-1000 ease-out shadow-sm" style={{ width: `${value}%`, background: color }} />
     </div>
   );
 }

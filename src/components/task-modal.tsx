@@ -105,14 +105,14 @@ export function TaskModal({
             <input
               autoFocus required value={title} onChange={(e) => setTitle(e.target.value)}
               placeholder="What needs to be done?"
-              className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm outline-none focus:border-brand"
+              className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm transition-all duration-150 focus:border-brand focus:shadow-lg"
             />
 
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-ink-2">Status</label>
                 <select value={status} onChange={(e) => setStatus(e.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-sm outline-none focus:border-brand">
+                  className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-sm transition-all duration-150 focus:border-brand focus:shadow-lg">
                   {statusOptions.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                 </select>
               </div>
@@ -126,7 +126,7 @@ export function TaskModal({
               <div>
                 <label className="block text-xs font-semibold text-ink-2">Assignee</label>
                 <select value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-sm outline-none focus:border-brand">
+                  className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-sm transition-all duration-150 focus:border-brand focus:shadow-lg">
                   <option value="">Unassigned</option>
                   {members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                 </select>
@@ -136,7 +136,7 @@ export function TaskModal({
                 <input
                   type="number" min={0} max={200} value={estimate}
                   onChange={(e) => setEstimate(Number(e.target.value))}
-                  className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-sm outline-none focus:border-brand"
+                  className="mt-1.5 w-full rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-sm transition-all duration-150 focus:border-brand focus:shadow-lg"
                 />
               </div>
             </div>
