@@ -21,8 +21,9 @@ async function getScopedDiscussion(id: string, orgId: string) {
 
 /** Get a discussion with its replies. */
 export const GET = requireUser(
-  async (req: NextRequest, context: SessionContext, { params }: { params: { id: string } }) => {
-    const discussion = await getScopedDiscussion(params.id, context.orgId);
+  async (req: NextRequest, context: SessionContext, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
+    const discussion = await getScopedDiscussion(id, context.orgId);
     if (!discussion) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({
       id: discussion.id,
@@ -38,8 +39,9 @@ export const GET = requireUser(
 
 /** Add a reply to a discussion. */
 export const POST = requireUser(
-  async (req: NextRequest, context: SessionContext, { params }: { params: { id: string } }) => {
-    const discussion = await getScopedDiscussion(params.id, context.orgId);
+  async (req: NextRequest, context: SessionContext, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
+    const discussion = await getScopedDiscussion(id, context.orgId);
     if (!discussion) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
     const { body } = await req.json().catch(() => ({}));
@@ -48,7 +50,7 @@ export const POST = requireUser(
     }
 
     const reply = await db.discussionReply.create({
-      data: { body: body.trim().slice(0, 10000), discussionId: params.id, authorId: context.user.id },
+      data: { body: body.trim().slice(0, 10000), discussionId: id, authorId: context.user.id },
       include: { author: { select: { id: true, name: true, initials: true, color: true } } },
     });
 

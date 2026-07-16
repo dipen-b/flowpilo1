@@ -5,8 +5,8 @@ import { SessionContext } from "@/lib/auth";
 
 /** Get all tasks for a project (used for real-time updates). */
 export const GET = requireUser(
-  async (req: NextRequest, context: SessionContext, { params }: { params: { id: string } }) => {
-    const projectId = params.id;
+  async (req: NextRequest, context: SessionContext, { params }: { params: Promise<{ id: string }> }) => {
+    const { id: projectId } = await params;
 
     const project = await db.project.findUnique({
       where: { id: projectId },
