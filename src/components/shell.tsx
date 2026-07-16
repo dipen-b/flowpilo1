@@ -6,9 +6,11 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard, FolderKanban, Timer, Users, BarChart3, FileText,
   Zap, Settings, Compass, Sun, Moon, Search, Menu, X, LogOut, Calendar,
+  Palette, Check,
 } from "lucide-react";
 import { CommandPalette, useCommandPalette } from "@/components/command-palette";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { ACCENTS, applyAccent, type Accent } from "@/lib/accents";
 
 export interface ShellUser {
   id: string;
@@ -53,6 +55,48 @@ export function ThemeToggle() {
       className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-ink-3 hover:text-ink-2 transition hover:bg-surface-2 hover:border-brand">
       {dark ? <Sun size={16} /> : <Moon size={16} />}
     </button>
+  );
+}
+
+export function AccentPicker() {
+  const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState("teal");
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fp-accent-name");
+      if (saved) setCurrent(saved);
+    } catch {}
+  }, []);
+  const pick = (accent: Accent) => {
+    applyAccent(accent);
+    setCurrent(accent.name);
+    setOpen(false);
+  };
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen((o) => !o)} aria-label="Theme color"
+        className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-ink-3 hover:text-ink-2 transition hover:bg-surface-2 hover:border-brand">
+        <Palette size={16} />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-12 z-50 w-48 rounded-xl border border-line bg-surface p-3.5 shadow-lg float-up">
+          <p className="mb-2.5 text-xs font-semibold text-ink-2">Theme color</p>
+          <div className="grid grid-cols-4 gap-2.5">
+            {ACCENTS.map((accent) => (
+              <button key={accent.name} title={accent.label} aria-label={accent.label}
+                onClick={() => pick(accent)}
+                className="flex h-8 w-8 items-center justify-center rounded-full transition hover:scale-110"
+                style={{
+                  background: accent.brand,
+                  boxShadow: current === accent.name ? `0 0 0 2px var(--surface), 0 0 0 4px ${accent.brand}` : undefined,
+                }}>
+                {current === accent.name && <Check size={14} className="text-white" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -129,6 +173,7 @@ export function AppShell({ children, user, sprint }: { children: React.ReactNode
         </button>
         <div className="ml-auto flex items-center gap-3">
           <NotificationsBell />
+          <AccentPicker />
           <ThemeToggle />
           <div className="relative">
             <button

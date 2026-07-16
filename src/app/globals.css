@@ -122,27 +122,17 @@ body {
   font-size: 14px;
   letter-spacing: -0.3px;
   padding: 12px 20px;
-  background: #14b8a6;
+  background: var(--brand);
   color: #ffffff;
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 30%, transparent);
 }
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(20, 184, 166, 0.4);
-  background: #0d9488;
-}
-.dark .btn-primary {
-  background: #2dd4bf;
-  color: #000000;
-  box-shadow: 0 4px 12px rgba(45, 212, 191, 0.25);
-}
-.dark .btn-primary:hover {
-  background: #5eead4;
-  box-shadow: 0 12px 32px rgba(45, 212, 191, 0.35);
-  transform: translateY(-3px);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--brand) 40%, transparent);
+  background: var(--brand-2);
 }
 .btn-primary:active {
   transform: translateY(-1px);
@@ -177,7 +167,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #000000, #333333);
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
