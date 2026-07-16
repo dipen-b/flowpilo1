@@ -15,12 +15,13 @@ async function verifyProjectAccess(projectId: string, orgId: string) {
 
 /** List chat messages for a project (Campfire). */
 export const GET = requireUser(
-  async (req: NextRequest, context: SessionContext, { params }: { params: { id: string } }) => {
-    const denied = await verifyProjectAccess(params.id, context.orgId);
+  async (req: NextRequest, context: SessionContext, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
+    const denied = await verifyProjectAccess(id, context.orgId);
     if (denied) return NextResponse.json({ error: denied.error }, { status: denied.status });
 
     const messages = await db.chatMessage.findMany({
-      where: { projectId: params.id },
+      where: { projectId: id },
       include: { author: { select: { id: true, name: true, initials: true, color: true } } },
       orderBy: { createdAt: "asc" },
       take: 200,
@@ -32,8 +33,9 @@ export const GET = requireUser(
 
 /** Post a chat message. */
 export const POST = requireUser(
-  async (req: NextRequest, context: SessionContext, { params }: { params: { id: string } }) => {
-    const denied = await verifyProjectAccess(params.id, context.orgId);
+  async (req: NextRequest, context: SessionContext, { params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
+    const denied = await verifyProjectAccess(id, context.orgId);
     if (denied) return NextResponse.json({ error: denied.error }, { status: denied.status });
 
     const { body } = await req.json().catch(() => ({}));
@@ -42,7 +44,7 @@ export const POST = requireUser(
     }
 
     const message = await db.chatMessage.create({
-      data: { body: body.trim().slice(0, 4000), projectId: params.id, authorId: context.user.id },
+      data: { body: body.trim().slice(0, 4000), projectId: id, authorId: context.user.id },
       include: { author: { select: { id: true, name: true, initials: true, color: true } } },
     });
 
