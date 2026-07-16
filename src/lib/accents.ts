@@ -17,6 +17,21 @@ export const ACCENTS: Accent[] = [
   { name: "slate", label: "Slate", brand: "#64748b", brand2: "#475569", soft: "rgba(100, 116, 139, 0.12)" },
 ];
 
+export function accentFromHex(hex: string): Accent {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const darken = (v: number) => Math.max(0, Math.round(v * 0.8));
+  const toHex = (v: number) => v.toString(16).padStart(2, "0");
+  return {
+    name: "custom",
+    label: "Custom",
+    brand: hex,
+    brand2: `#${toHex(darken(r))}${toHex(darken(g))}${toHex(darken(b))}`,
+    soft: `rgba(${r}, ${g}, ${b}, 0.12)`,
+  };
+}
+
 export function applyAccent(accent: Accent) {
   const style = document.documentElement.style;
   style.setProperty("--brand", accent.brand);

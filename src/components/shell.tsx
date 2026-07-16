@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { CommandPalette, useCommandPalette } from "@/components/command-palette";
 import { NotificationsBell } from "@/components/notifications-bell";
-import { ACCENTS, applyAccent, type Accent } from "@/lib/accents";
+import { ACCENTS, accentFromHex, applyAccent, type Accent } from "@/lib/accents";
 
 export interface ShellUser {
   id: string;
@@ -61,16 +61,26 @@ export function ThemeToggle() {
 export function AccentPicker() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("teal");
+  const [customHex, setCustomHex] = useState("#14b8a6");
   useEffect(() => {
     try {
       const saved = localStorage.getItem("fp-accent-name");
       if (saved) setCurrent(saved);
+      if (saved === "custom") {
+        const stored = localStorage.getItem("fp-accent");
+        if (stored) setCustomHex(JSON.parse(stored).brand);
+      }
     } catch {}
   }, []);
   const pick = (accent: Accent) => {
     applyAccent(accent);
     setCurrent(accent.name);
     setOpen(false);
+  };
+  const pickCustom = (hex: string) => {
+    setCustomHex(hex);
+    applyAccent(accentFromHex(hex));
+    setCurrent("custom");
   };
   return (
     <div className="relative">
@@ -93,6 +103,22 @@ export function AccentPicker() {
                 {current === accent.name && <Check size={14} className="text-white" />}
               </button>
             ))}
+          </div>
+          <div className="mt-3 border-t border-line pt-3">
+            <label className="flex cursor-pointer items-center gap-2.5">
+              <span className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full transition hover:scale-110"
+                style={{
+                  background: customHex,
+                  boxShadow: current === "custom" ? `0 0 0 2px var(--surface), 0 0 0 4px ${customHex}` : undefined,
+                }}>
+                <input type="color" value={customHex} aria-label="Custom theme color"
+                  onChange={(e) => pickCustom(e.target.value)}
+                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                {current === "custom" && <Check size={14} className="pointer-events-none text-white" />}
+              </span>
+              <span className="text-xs font-medium text-ink-2">Custom</span>
+              <span className="tabular ml-auto text-xs text-ink-3">{customHex}</span>
+            </label>
           </div>
         </div>
       )}
