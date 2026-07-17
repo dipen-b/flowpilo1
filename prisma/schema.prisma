@@ -57,6 +57,7 @@ model User {
   chatMessages ChatMessage[] @relation("ChatAuthor")
   discussions  Discussion[]  @relation("DiscussionAuthor")
   discussionReplies DiscussionReply[] @relation("ReplyAuthor")
+  discussionReads DiscussionRead[]
   createdAt    DateTime     @default(now())
 }
 
@@ -127,9 +128,22 @@ model Discussion {
   authorId  String
   author    User     @relation("DiscussionAuthor", fields: [authorId], references: [id])
   replies   DiscussionReply[]
+  reads     DiscussionRead[]
   createdAt DateTime @default(now())
 
   @@index([projectId, createdAt])
+}
+
+model DiscussionRead {
+  id           String     @id @default(cuid())
+  discussionId String
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastReadAt   DateTime   @default(now())
+
+  @@unique([discussionId, userId])
+  @@index([userId])
 }
 
 model DiscussionReply {

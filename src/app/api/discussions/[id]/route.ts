@@ -19,12 +19,25 @@ async function getScopedDiscussion(id: string, orgId: string) {
   return discussion;
 }
 
+/** Upsert this user's read marker for the discussion to "now". */
+async function markRead(discussionId: string, userId: string) {
+  await db.discussionRead.upsert({
+    where: { discussionId_userId: { discussionId, userId } },
+    create: { discussionId, userId },
+    update: { lastReadAt: new Date() },
+  });
+}
+
 /** Get a discussion with its replies. */
 export const GET = requireUser(
   async (req: NextRequest, context: SessionContext, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
     const discussion = await getScopedDiscussion(id, context.orgId);
     if (!discussion) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Opening a discussion marks it read for this user.
+    await markRead(id, context.user.id);
+
     return NextResponse.json({
       id: discussion.id,
       title: discussion.title,
@@ -53,6 +66,9 @@ export const POST = requireUser(
       data: { body: body.trim().slice(0, 10000), discussionId: id, authorId: context.user.id },
       include: { author: { select: { id: true, name: true, initials: true, color: true } } },
     });
+
+    // Posting a reply means the author has seen everything up to now.
+    await markRead(id, context.user.id);
 
     return NextResponse.json(reply, { status: 201 });
   }
