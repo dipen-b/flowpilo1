@@ -25,20 +25,33 @@ export const GET = requireUser(
       include: {
         author: { select: { id: true, name: true, initials: true, color: true } },
         _count: { select: { replies: true } },
+        // latest reply timestamp — used to decide if there's new activity
+        replies: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
+        // this user's read marker for the discussion (unique per [discussion,user])
+        reads: { where: { userId: context.user.id }, select: { lastReadAt: true } },
       },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(
-      discussions.map((d) => ({
+    const payload = discussions.map((d) => {
+      const lastActivity = d.replies[0]?.createdAt ?? d.createdAt;
+      const lastRead = d.reads[0]?.lastReadAt ?? null;
+      const unread = !lastRead || lastActivity > lastRead;
+      return {
         id: d.id,
         title: d.title,
         excerpt: d.body.slice(0, 160),
         author: d.author,
         replyCount: d._count.replies,
         createdAt: d.createdAt,
-      }))
-    );
+        unread,
+      };
+    });
+
+    return NextResponse.json({
+      discussions: payload,
+      unreadCount: payload.filter((d) => d.unread).length,
+    });
   }
 );
 
@@ -60,6 +73,8 @@ export const POST = requireUser(
         body: body.trim().slice(0, 10000),
         projectId: id,
         authorId: context.user.id,
+        // author has implicitly read their own post
+        reads: { create: { userId: context.user.id } },
       },
       include: { author: { select: { id: true, name: true, initials: true, color: true } } },
     });

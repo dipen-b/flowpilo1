@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, MessageSquare, Plus, X } from "lucide-react";
+import { ArrowLeft, MessageSquare, Plus, X, CheckCheck } from "lucide-react";
 
 interface Author {
   id: string;
@@ -18,6 +18,7 @@ interface DiscussionSummary {
   author: Author;
   replyCount: number;
   createdAt: string;
+  unread: boolean;
 }
 
 interface Reply {
@@ -59,6 +60,7 @@ export function ProjectMessages({
   projectEmoji: string;
 }) {
   const [discussions, setDiscussions] = useState<DiscussionSummary[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [composing, setComposing] = useState(false);
   const [title, setTitle] = useState("");
@@ -71,18 +73,34 @@ export function ProjectMessages({
   const load = useCallback(async () => {
     const res = await fetch(`/api/projects/${projectId}/discussions`).catch(() => null);
     if (!res?.ok) return;
-    setDiscussions(await res.json());
+    const data = await res.json();
+    setDiscussions(data.discussions);
+    setUnreadCount(data.unreadCount);
     setLoaded(true);
   }, [projectId]);
+
+  async function markAllRead() {
+    setUnreadCount(0);
+    setDiscussions((prev) => prev.map((d) => ({ ...d, unread: false })));
+    await fetch(`/api/projects/${projectId}/discussions/read`, { method: "POST" }).catch(() => null);
+    load();
+  }
 
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
     if (!openId) { setDetail(null); return; }
+    // Opening marks it read on the server; reflect that locally right away.
+    setDiscussions((prev) => prev.map((d) => (d.id === openId ? { ...d, unread: false } : d)));
+    setUnreadCount((prev) => {
+      const wasUnread = discussions.find((d) => d.id === openId)?.unread;
+      return wasUnread ? Math.max(0, prev - 1) : prev;
+    });
     fetch(`/api/discussions/${openId}`)
       .then((r) => (r.ok ? r.json() : null))
       .then(setDetail)
       .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openId]);
 
   async function post() {
@@ -183,9 +201,21 @@ export function ProjectMessages({
           <MessageSquare size={26} style={{ color: "var(--brand)" }} /> Message Board
         </h1>
         <p className="mt-1 text-sm text-ink-3">Post announcements, pitch ideas, and keep discussions on-topic</p>
-        <button onClick={() => setComposing((c) => !c)} className="btn-primary mt-4 !rounded-full">
-          {composing ? <><X size={15} /> Cancel</> : <><Plus size={15} /> New message</>}
-        </button>
+        {unreadCount > 0 && (
+          <p className="mt-2 text-sm font-semibold" style={{ color: "var(--brand)" }}>
+            {unreadCount} unread {unreadCount === 1 ? "message" : "messages"}
+          </p>
+        )}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <button onClick={() => setComposing((c) => !c)} className="btn-primary !rounded-full">
+            {composing ? <><X size={15} /> Cancel</> : <><Plus size={15} /> New message</>}
+          </button>
+          {unreadCount > 0 && (
+            <button onClick={markAllRead} className="btn-ghost !rounded-full">
+              <CheckCheck size={15} /> Mark all read
+            </button>
+          )}
+        </div>
       </header>
 
       {composing && (
@@ -216,11 +246,24 @@ export function ProjectMessages({
             {discussions.map((d) => (
               <li key={d.id}>
                 <button onClick={() => setOpenId(d.id)}
-                  className="flex w-full items-start gap-4 px-6 py-5 text-left transition hover:bg-surface-2">
+                  className="flex w-full items-start gap-3 px-6 py-5 text-left transition hover:bg-surface-2"
+                  style={d.unread ? { background: "var(--brand-soft)" } : undefined}>
+                  <span className="mt-2 flex w-2.5 shrink-0 justify-center" aria-hidden>
+                    {d.unread && (
+                      <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--brand)" }}
+                        title="Unread" />
+                    )}
+                  </span>
                   <Avatar author={d.author} />
                   <div className="min-w-0 flex-1">
-                    <p className="font-serif text-lg font-bold leading-snug text-ink">{d.title}</p>
-                    <p className="mt-0.5 line-clamp-2 text-sm text-ink-2">
+                    <p className={`font-serif text-lg leading-snug text-ink ${d.unread ? "font-extrabold" : "font-bold"}`}>
+                      {d.title}
+                      {d.unread && (
+                        <span className="ml-2 align-middle rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
+                          style={{ background: "var(--brand)" }}>New</span>
+                      )}
+                    </p>
+                    <p className={`mt-0.5 line-clamp-2 text-sm ${d.unread ? "text-ink" : "text-ink-2"}`}>
                       <span className="font-medium">{d.author.name}:</span> {d.excerpt}
                     </p>
                   </div>
