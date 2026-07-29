@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+:root {
+  /* Dark mode (default) - Pure Black and White */
+  --primary-bg: #000000;
+  --secondary-bg: #111111;
+  --card-bg: #1a1a1a;
+  --border: #333333;
+  --primary-text: #ffffff;
+  --secondary-text: #cccccc;
+  --accent: #000000;
+  --success: #ffffff;
+  --warning: #ffffff;
+  --danger: #ffffff;
+  --background: var(--primary-bg);
+  --foreground: var(--primary-text);
+  --accent-blue: #000000;
+  --accent-purple: #000000;
+}
+
+/* Light mode */
+html.light {
+  --primary-bg: #ffffff;
+  --secondary-bg: #f9f9f9;
+  --card-bg: #f0f0f0;
+  --border: #dddddd;
+  --primary-text: #000000;
+  --secondary-text: #555555;
+  --accent: #ffffff;
+  --success: #000000;
+  --warning: #000000;
+  --danger: #000000;
+  --background: var(--primary-bg);
+  --foreground: var(--primary-text);
+  --accent-blue: #ffffff;
+  --accent-purple: #ffffff;
+}
+
+@theme inline {
+  --color-primary: var(--primary-bg);
+  --color-secondary: var(--secondary-bg);
+  --color-card: var(--card-bg);
+  --color-border: var(--border);
+  --color-text-primary: var(--primary-text);
+  --color-text-secondary: var(--secondary-text);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-purple: var(--accent-purple);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-raleway);
+  --font-mono: var(--font-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-raleway), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Elegant typography hierarchy with Raleway */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-raleway), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+label,
+.text-xs {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.text-sm {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.text-base {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.text-lg {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.text-xl {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.text-2xl {
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.text-3xl {
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+/* Font weight utilities */
+.font-light {
+  font-weight: 300;
+}
+
+.font-normal {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* Performance optimization: Only animate interactive elements */
+button,
+a,
+input,
+select,
+textarea {
+  @apply transition-colors;
+}
+
+/* Disable pointer events during scroll for better performance */
+main {
+  contain: layout style paint;
+}
