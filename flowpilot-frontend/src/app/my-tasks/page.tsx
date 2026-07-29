@@ -165,7 +165,7 @@ function MyTasksContent() {
                       </h3>
                     </div>
                     <div className="flex items-center gap-3 flex-wrap">
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="default" className="text-xs">
                         {task.project}
                       </Badge>
                       <Badge className={`text-xs font-semibold ${statusConfig[task.status as keyof typeof statusConfig].color}`}>

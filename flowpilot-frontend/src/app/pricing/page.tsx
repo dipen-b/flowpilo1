@@ -209,7 +209,7 @@ export default function PricingPage() {
                           ${monthlyEquivalent}/month for {teamSize} people
                         </p>
                       )}
-                      {billingPeriod === "annual" && (
+                      {billingPeriod === "annual" && plan.pricePerUserMonth && plan.pricePerUserYear && (
                         <p className="text-xs text-green-500 mt-2">
                           Save ${(plan.pricePerUserMonth * 12 - plan.pricePerUserYear) * teamSize}/year with annual
                         </p>

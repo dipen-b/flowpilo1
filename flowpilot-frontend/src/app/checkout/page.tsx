@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { AppLayout } from "@/components/layout";
 import { Check, AlertCircle, Loader } from "lucide-react";
 
-export default function CheckoutPage() {
+export const dynamic = "force-dynamic";
+
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -244,5 +246,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

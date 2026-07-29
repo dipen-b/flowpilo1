@@ -461,7 +461,7 @@ function FilesContent() {
 
                     <div className="flex items-center gap-2">
                       {file.isPrivate && (
-                        <Lock size={16} className="text-orange-600" title="Private file" />
+                        <Lock size={16} className="text-orange-600" />
                       )}
                       <Badge variant="secondary" className="text-xs capitalize">
                         {file.type}
@@ -488,6 +488,7 @@ function FilesContent() {
                             type: file.isPrivate ? "private" : "team",
                             canEdit: false,
                             sharedWith: [],
+                            expiresAt: null,
                           });
                         }}
                         title="Share file"

@@ -1,0 +1,186 @@
+
+> flowpilot-backend@0.1.0 dev
+> nest start --watch
+
+[2J[3J[H[[90m2:32:41 PM[0m] Starting compilation in watch mode...
+
+[[90m2:32:43 PM[0m] Found 0 errors. Watching for file changes.
+
+(node:13864) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +12ms[39m
+✅ WebSocket Gateway Initialized
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mActivityGateway subscribed to the "activity:create" message[39m[38;5;3m +12ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mActivityGateway subscribed to the "ping" message[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mActivityController {/api/activities}:[39m[38;5;3m +2ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities, POST} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/recent/:limit, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/type/:type, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/clear, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mTaskController {/api/tasks}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mProjectController {/api/projects}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, PUT} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 13865  - [39m07/29/2026, 2:32:44 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +1ms[39m
+✅ Server running on http://localhost:3001
+📢 Broadcasting activity: created on 🚀 Implement real-time notifications
+📢 Broadcasting activity: created on 🚀 Implement real-time notifications
+📢 Broadcasting activity: created on 🎨 Design System v2
+[2J[3J[H[[90m2:42:24 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m2:42:24 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +12ms[39m
+✅ WebSocket Gateway Initialized
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mActivityGateway subscribed to the "activity:create" message[39m[38;5;3m +18ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mActivityGateway subscribed to the "ping" message[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mActivityController {/api/activities}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities, POST} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/recent/:limit, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/type/:type, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/clear, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mTaskController {/api/tasks}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, PUT} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mProjectController {/api/projects}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, DELETE} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 14071  - [39m07/29/2026, 2:42:25 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +1ms[39m
+✅ Server running on http://localhost:3001
+[2J[3J[H[[90m2:42:32 PM[0m] File change detected. Starting incremental compilation...
+
+[[90m2:42:33 PM[0m] Found 0 errors. Watching for file changes.
+
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +8ms[39m
+✅ WebSocket Gateway Initialized
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mActivityGateway subscribed to the "activity:create" message[39m[38;5;3m +14ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[WebSocketsController] [39m[32mActivityGateway subscribed to the "ping" message[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mActivityController {/api/activities}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities, POST} route[39m[38;5;3m +2ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/recent/:limit, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/type/:type, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/activities/clear, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mTaskController {/api/tasks}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks, POST} route[39m[38;5;3m +4ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, PUT} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/tasks/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mProjectController {/api/projects}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/projects/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 14082  - [39m07/29/2026, 2:42:33 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +2ms[39m
+✅ Server running on http://localhost:3001
+[2J[3J[H[[90m2:42:40 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m46[0m:[93m24[0m - [91merror[0m[90m TS7053: [0mElement implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ free: { maxProjects: number; maxTeamMembers: number; maxStorage: number; maxActivityEntries: number; features: { ganttChart: boolean; advancedReports: boolean; slackIntegration: boolean; customWorkflows: boolean; desktopNotifications: boolean; emailDigests: boolean; sso: boolean; apiAccess: boolean; }; }; pro: { ....'.
+  No index signature with a parameter of type 'string' was found on type '{ free: { maxProjects: number; maxTeamMembers: number; maxStorage: number; maxActivityEntries: number; features: { ganttChart: boolean; advancedReports: boolean; slackIntegration: boolean; customWorkflows: boolean; desktopNotifications: boolean; emailDigests: boolean; sso: boolean; apiAccess: boolean; }; }; pro: { ....'.
+
+[7m46[0m     const planLimits = PLAN_LIMITS[plan];
+[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m68[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m68[0m   checkFeature(@Body() body: { plan: string; feature: string }) {
+[7m  [0m [91m  ~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m80[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m80[0m   checkProjectLimit(@Body() body: { plan: string; currentProjectCount: number }) {
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m98[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m98[0m   checkMemberLimit(@Body() body: { plan: string; currentMemberCount: number }) {
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m116[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m116[0m   checkStorageLimit(@Body() body: { plan: string; currentUsage: number; fileSize: number }) {
+[7m   [0m [91m  ~~~~~~~~~~~~~~~~~[0m
+
+[[90m2:42:40 PM[0m] Found 5 errors. Watching for file changes.
+
+[2J[3J[H[[90m2:42:42 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m46[0m:[93m24[0m - [91merror[0m[90m TS7053: [0mElement implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ free: { maxProjects: number; maxTeamMembers: number; maxStorage: number; maxActivityEntries: number; features: { ganttChart: boolean; advancedReports: boolean; slackIntegration: boolean; customWorkflows: boolean; desktopNotifications: boolean; emailDigests: boolean; sso: boolean; apiAccess: boolean; }; }; pro: { ....'.
+  No index signature with a parameter of type 'string' was found on type '{ free: { maxProjects: number; maxTeamMembers: number; maxStorage: number; maxActivityEntries: number; features: { ganttChart: boolean; advancedReports: boolean; slackIntegration: boolean; customWorkflows: boolean; desktopNotifications: boolean; emailDigests: boolean; sso: boolean; apiAccess: boolean; }; }; pro: { ....'.
+
+[7m46[0m     const planLimits = PLAN_LIMITS[plan];
+[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m68[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m68[0m   checkFeature(@Body() body: { plan: string; feature: string }) {
+[7m  [0m [91m  ~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m80[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m80[0m   checkProjectLimit(@Body() body: { plan: string; currentProjectCount: number }) {
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m98[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m98[0m   checkMemberLimit(@Body() body: { plan: string; currentMemberCount: number }) {
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m116[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m116[0m   checkStorageLimit(@Body() body: { plan: string; currentUsage: number; fileSize: number }) {
+[7m   [0m [91m  ~~~~~~~~~~~~~~~~~[0m
+
+[[90m2:42:42 PM[0m] Found 5 errors. Watching for file changes.
+
+[2J[3J[H[[90m2:42:47 PM[0m] File change detected. Starting incremental compilation...
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m46[0m:[93m24[0m - [91merror[0m[90m TS7053: [0mElement implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ free: { maxProjects: number; maxTeamMembers: number; maxStorage: number; maxActivityEntries: number; features: { ganttChart: boolean; advancedReports: boolean; slackIntegration: boolean; customWorkflows: boolean; desktopNotifications: boolean; emailDigests: boolean; sso: boolean; apiAccess: boolean; }; }; pro: { ....'.
+  No index signature with a parameter of type 'string' was found on type '{ free: { maxProjects: number; maxTeamMembers: number; maxStorage: number; maxActivityEntries: number; features: { ganttChart: boolean; advancedReports: boolean; slackIntegration: boolean; customWorkflows: boolean; desktopNotifications: boolean; emailDigests: boolean; sso: boolean; apiAccess: boolean; }; }; pro: { ....'.
+
+[7m46[0m     const planLimits = PLAN_LIMITS[plan];
+[7m  [0m [91m                       ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m68[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m68[0m   checkFeature(@Body() body: { plan: string; feature: string }) {
+[7m  [0m [91m  ~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m80[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m80[0m   checkProjectLimit(@Body() body: { plan: string; currentProjectCount: number }) {
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m98[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m98[0m   checkMemberLimit(@Body() body: { plan: string; currentMemberCount: number }) {
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/modules/plans/plans.controller.ts[0m:[93m116[0m:[93m3[0m - [91merror[0m[90m TS4053: [0mReturn type of public method from exported class has or is using name 'CheckFeatureResult' from external module "/Users/qa/AIQA/flowpilot-backend/src/modules/plans/plans.service" but cannot be named.
+
+[7m116[0m   checkStorageLimit(@Body() body: { plan: string; currentUsage: number; fileSize: number }) {
+[7m   [0m [91m  ~~~~~~~~~~~~~~~~~[0m
+
+[[90m2:42:48 PM[0m] Found 5 errors. Watching for file changes.
+

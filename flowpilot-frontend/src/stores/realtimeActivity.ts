@@ -10,7 +10,7 @@ interface RealtimeStatus {
 }
 
 interface RealtimeActivityStore extends RealtimeStatus {
-  initializeRealtime: () => void;
+  initializeRealtime: () => (() => void) | undefined;
   cleanup: () => void;
   updateRealtimeStatus: (status: Partial<RealtimeStatus>) => void;
 }
