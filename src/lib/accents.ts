@@ -7,15 +7,10 @@ export interface Accent {
 }
 
 export const ACCENTS: Accent[] = [
-  { name: "amber", label: "Amber", brand: "#c19a2e", brand2: "#a5811f", soft: "rgba(193, 154, 46, 0.14)" },
-  { name: "teal", label: "Teal", brand: "#14b8a6", brand2: "#0d9488", soft: "rgba(20, 184, 166, 0.12)" },
-  { name: "blue", label: "Blue", brand: "#3b82f6", brand2: "#2563eb", soft: "rgba(59, 130, 246, 0.12)" },
-  { name: "indigo", label: "Indigo", brand: "#4f46e5", brand2: "#4338ca", soft: "rgba(79, 70, 229, 0.12)" },
-  { name: "purple", label: "Purple", brand: "#8b5cf6", brand2: "#7c3aed", soft: "rgba(139, 92, 246, 0.12)" },
-  { name: "green", label: "Green", brand: "#10b981", brand2: "#059669", soft: "rgba(16, 185, 129, 0.12)" },
-  { name: "orange", label: "Orange", brand: "#f97316", brand2: "#ea580c", soft: "rgba(249, 115, 22, 0.12)" },
-  { name: "rose", label: "Rose", brand: "#f43f5e", brand2: "#e11d48", soft: "rgba(244, 63, 94, 0.12)" },
-  { name: "slate", label: "Slate", brand: "#64748b", brand2: "#475569", soft: "rgba(100, 116, 139, 0.12)" },
+  { name: "black", label: "Black", brand: "#000000", brand2: "#333333", soft: "rgba(0, 0, 0, 0.06)" },
+  { name: "charcoal", label: "Charcoal", brand: "#1a1a1a", brand2: "#404040", soft: "rgba(26, 26, 26, 0.08)" },
+  { name: "slate", label: "Slate", brand: "#475569", brand2: "#334155", soft: "rgba(71, 85, 105, 0.1)" },
+  { name: "gray", label: "Gray", brand: "#6b7280", brand2: "#4b5563", soft: "rgba(107, 114, 128, 0.1)" },
 ];
 
 export function accentFromHex(hex: string): Accent {
