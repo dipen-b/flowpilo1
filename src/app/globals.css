@@ -12,9 +12,10 @@
   --ink: #1a1a1a;
   --ink-2: #666666;
   --ink-3: #999999;
-  --brand: #000000;
-  --brand-2: #333333;
-  --brand-soft: rgba(0, 0, 0, 0.06);
+  --brand: #1a1a1a;
+  --brand-2: #404040;
+  --brand-soft: rgba(26, 26, 26, 0.1);
+  --brand-text: #ffffff;
   --good: #16a34a;
   --warn: #ea580c;
   --serious: #dc2626;
