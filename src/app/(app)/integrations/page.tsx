@@ -149,13 +149,13 @@ export default function IntegrationsPage() {
               git commit -m "Fixes BANK-152: implement auth flow"
             </code>
           </p>
-          <p>
-            <strong>Keywords:</strong>
+          <div>
+            <p className="font-semibold">Keywords:</p>
             <ul className="mt-1 ml-4 list-disc">
               <li>"Fixes", "Closes", "Resolves" → Task moves to Done</li>
               <li>"WIP:" or "WIP " → Task moves to In Progress</li>
             </ul>
-          </p>
+          </div>
         </div>
       </Card>
     </div>
