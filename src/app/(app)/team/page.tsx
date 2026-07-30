@@ -2,6 +2,7 @@ import { Card, Avatar, Progress, RiskBadge, Stat } from "@/components/ui";
 import { InviteMember } from "@/components/invite-member";
 import { ResetLinkButton } from "@/components/reset-link-button";
 import { DeactivateMemberButton } from "@/components/deactivate-member-button";
+import { ReactivateMemberButton } from "@/components/reactivate-member-button";
 import { Sparkline } from "@/components/charts";
 import { type RiskLevel } from "@/lib/data";
 import { getMembers } from "@/lib/queries";
@@ -111,6 +112,7 @@ export default async function Team() {
                 <th className="px-5 py-3 font-medium">Member</th>
                 <th className="px-5 py-3 font-medium">Role</th>
                 <th className="px-5 py-3 font-medium">Deactivated</th>
+                {["owner", "admin"].includes(session.user.role) && <th className="px-5 py-3" />}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -126,6 +128,11 @@ export default async function Team() {
                   <td className="px-5 py-3.5 text-xs text-ink-3">
                     {m.deactivatedAt ? new Date(m.deactivatedAt).toLocaleDateString() : "—"}
                   </td>
+                  {["owner", "admin"].includes(session.user.role) && (
+                    <td className="px-5 py-3.5 flex gap-1.5 justify-end">
+                      <ReactivateMemberButton userId={m.id} userName={m.name} />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
