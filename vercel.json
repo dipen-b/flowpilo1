@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd flowpilot-frontend && npm run build",
-  "devCommand": "cd flowpilot-frontend && npm run dev",
-  "installCommand": "cd flowpilot-frontend && npm install",
-  "outputDirectory": "flowpilot-frontend/.next"
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "outputDirectory": ".next"
 }
