@@ -279,11 +279,11 @@ export default function Landing() {
 
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-5 pb-24">
-        <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl px-8 py-16 text-center text-white"
-          style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-2))" }}>
+        <motion.div {...fadeUp} className="relative overflow-hidden rounded-3xl px-8 py-16 text-center"
+          style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-2))", color: "var(--brand-text)" }}>
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Give your projects a home they deserve</h2>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-white/85">Free for teams up to 5. Set up your first project in 60 seconds.</p>
-          <Link href="/signup" className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold transition hover:scale-[1.02]" style={{ color: "var(--brand)" }}>
+          <p className="mx-auto mt-3 max-w-xl text-sm" style={{ opacity: 0.85 }}>Free for teams up to 5. Set up your first project in 60 seconds.</p>
+          <Link href="/signup" className="mt-8 inline-flex items-center gap-2 rounded-xl px-7 py-3 text-sm font-bold transition hover:scale-[1.02]" style={{ background: "var(--brand-text)", color: "var(--brand)" }}>
             Start Free
           </Link>
         </motion.div>
