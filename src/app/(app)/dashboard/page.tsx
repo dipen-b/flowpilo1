@@ -1,19 +1,12 @@
 import Link from "next/link";
-import { AlertTriangle, FolderKanban } from "lucide-react";
-import { Card, RiskBadge, PriorityBadge, Progress, Stat, Avatar } from "@/components/ui";
-import { HealthRing, Sparkline, Burndown, WorkloadHeatmap } from "@/components/charts";
+import { FolderKanban, AlertTriangle } from "lucide-react";
+import { Card, RiskBadge, PriorityBadge, Avatar, Progress } from "@/components/ui";
 import { MyTiming } from "@/components/my-timing";
-import { burndown, riskMeta, type RiskLevel, type Priority } from "@/lib/data";
+import { riskMeta, type RiskLevel, type Priority } from "@/lib/data";
 import { getDashboard, getTasks, getActiveSprint } from "@/lib/queries";
 import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
-
-function spreadLoad(load: number): number[] {
-  const base = Math.floor(load / 5);
-  const rem = load % 5;
-  return Array.from({ length: 5 }, (_, i) => base + (i < rem ? 1 : 0));
-}
 
 export default async function Dashboard() {
   const session = await getSessionUser();
@@ -42,7 +35,7 @@ export default async function Dashboard() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Good morning, {firstName} 👋</h1>
           <p className="mt-1 text-sm text-ink-2">
-            Thursday, Jul 10 · {projects.length} active projects · {critical + atRisk} need attention
+            {projects.length} active projects · {critical + atRisk} need attention
           </p>
         </div>
         <div className="flex gap-2">
@@ -55,35 +48,65 @@ export default async function Dashboard() {
         <MyTiming />
       </div>
 
-      {/* Score row */}
+      {/* Key metrics */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <Card title="Project Health" className="float-up">
-          <div className="flex items-center gap-4">
-            <HealthRing value={healthAvg} size={104} label="of 100" />
-            <div className="space-y-1.5 text-xs text-ink-2">
-              <p><span className="font-semibold" style={{ color: "var(--good)" }}>{onTrack} projects</span> on track</p>
-              <p><span className="font-semibold" style={{ color: "var(--warn)" }}>{atRisk} project{atRisk === 1 ? "" : "s"}</span> at risk</p>
-              <p><span className="font-semibold" style={{ color: "var(--critical)" }}>{critical} project{critical === 1 ? "" : "s"}</span> critical</p>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-ink-2">On track</span>
+              <span className="font-semibold" style={{ color: "var(--good)" }}>{onTrack}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-ink-2">At risk</span>
+              <span className="font-semibold" style={{ color: "var(--warn)" }}>{atRisk}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-ink-2">Critical</span>
+              <span className="font-semibold" style={{ color: "var(--critical)" }}>{critical}</span>
             </div>
           </div>
         </Card>
         <Card title="Open Work" className="float-up">
-          <Stat label="Tasks in flight" value={tasks.filter((t) => t.status !== "done").length}
-            sub={`${tasks.filter((t) => t.status === "in_review").length} in review`} subColor="var(--good)" />
-          <div className="mt-3"><Sparkline data={[24, 28, 26, 31, 29, 36, 41]} color="var(--series-2)" width={200} height={40} /></div>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-ink-2">Tasks in flight</span>
+              <span className="font-semibold text-lg">{tasks.filter((t) => t.status !== "done").length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-ink-2">In review</span>
+              <span className="font-semibold">{tasks.filter((t) => t.status === "in_review").length}</span>
+            </div>
+          </div>
         </Card>
         <Card title="Sprint Progress" className="float-up">
-          <Stat
-            label={sprint ? `${sprint.name} · ends ${sprint.endDate}` : "No active sprint"}
-            value={sprint ? `${sprint.progress}%` : "—"}
-            sub={sprint ? `${donePts} of ${totalPts} points done` : "Plan one from the Sprints page"}
-          />
-          <div className="mt-3"><Progress value={sprint?.progress ?? 0} /></div>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-ink-2">{sprint?.name ?? "No active sprint"}</span>
+              <span className="font-semibold text-lg">{sprint ? `${sprint.progress}%` : "—"}</span>
+            </div>
+            {sprint && (
+              <div className="flex justify-between text-xs text-ink-3">
+                <span>Ends {sprint.endDate}</span>
+                <span>{donePts} of {totalPts} points</span>
+              </div>
+            )}
+          </div>
         </Card>
         <Card title="Next Deadline" className="float-up">
-          <Stat label={projects[0]?.name ?? ""} value={projects[0]?.dueDate ?? "—"}
-            sub={`${projects[0]?.progress ?? 0}% complete`} subColor="var(--good)" />
-          <div className="mt-3"><Sparkline data={[40, 45, 52, 58, 61, 65, 68]} color="var(--series-1)" width={200} height={40} /></div>
+          {projects[0] ? (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-ink-2">{projects[0].name}</span>
+                <span className="font-semibold">{projects[0].dueDate}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-2">Progress</span>
+                <span className="font-semibold">{projects[0].progress}%</span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-ink-2">No projects yet</p>
+          )}
         </Card>
       </div>
 
@@ -125,16 +148,6 @@ export default async function Dashboard() {
                 </li>
               ))}
             </ul>
-          </Card>
-
-          {/* Sprint burndown */}
-          <Card title={`${sprint?.name ?? "Sprint"} Burndown`} action={<Link href="/sprints" className="text-xs font-semibold" style={{ color: "var(--brand)" }}>Sprint room →</Link>}>
-            <Burndown {...burndown} />
-          </Card>
-
-          {/* Workload heatmap */}
-          <Card title="Workload Heatmap" action={<span className="text-xs text-ink-3">hours/day this week</span>}>
-            <WorkloadHeatmap rows={members.map((m) => ({ name: m.name, days: spreadLoad(m.load), over: m.load > m.capacity }))} />
           </Card>
         </div>
 
