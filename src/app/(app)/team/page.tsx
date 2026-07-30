@@ -1,6 +1,7 @@
 import { Card, Avatar, Progress, RiskBadge, Stat } from "@/components/ui";
 import { InviteMember } from "@/components/invite-member";
 import { ResetLinkButton } from "@/components/reset-link-button";
+import { DeactivateMemberButton } from "@/components/deactivate-member-button";
 import { Sparkline } from "@/components/charts";
 import { type RiskLevel } from "@/lib/data";
 import { getMembers } from "@/lib/queries";
@@ -8,7 +9,6 @@ import { getSessionUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-/** Deterministic per-member trend line (placeholder until time tracking lands). */
 function trendFor(index: number): number[] {
   const bases = [
     [88, 90, 91, 89, 93, 92],
@@ -24,7 +24,10 @@ function trendFor(index: number): number[] {
 export default async function Team() {
   const session = await getSessionUser();
   if (!session) return <div>Unauthorized</div>;
-  const members = await getMembers(session.orgId);
+  const allMembers = await getMembers(session.orgId);
+  const members = allMembers.filter(m => m.active);
+  const deactivated = allMembers.filter(m => !m.active);
+  
   const over = members.filter((m) => m.load > m.capacity);
   const utilization = Math.round(
     (members.reduce((s, m) => s + m.load, 0) / (members.reduce((s, m) => s + m.capacity, 0) || 1)) * 100,
@@ -35,13 +38,13 @@ export default async function Team() {
       <div className="float-up flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Team</h1>
-          <p className="mt-1 text-sm text-ink-2">Product Engineering · {members.length} members</p>
+          <p className="mt-1 text-sm text-ink-2">Product Engineering · {members.length} active {deactivated.length > 0 && `(${deactivated.length} deactivated)`}</p>
         </div>
         {["owner", "admin"].includes(session.user.role) && <InviteMember />}
       </div>
 
       <div className="grid gap-5 sm:grid-cols-3">
-        <Card className="float-up"><Stat label="Members" value={members.length} sub="across 2 departments" /></Card>
+        <Card className="float-up"><Stat label="Active members" value={members.length} sub="across 2 departments" /></Card>
         <Card className="float-up">
           <Stat label="Utilization" value={`${utilization}%`} sub="Target band: 75–90%"
             subColor={utilization > 90 ? "var(--warn)" : "var(--good)"} />
@@ -53,7 +56,7 @@ export default async function Team() {
         </Card>
       </div>
 
-      <Card title="Members" className="overflow-x-auto p-0">
+      <Card title="Active Members" className="overflow-x-auto p-0">
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b border-line text-left text-xs text-ink-3">
@@ -88,7 +91,10 @@ export default async function Team() {
                   <td className="px-5 py-3.5"><Sparkline data={trendFor(i)} color={pct <= 100 ? "var(--series-2)" : "var(--series-3)"} width={110} height={30} /></td>
                   <td className="px-5 py-3.5"><RiskBadge level={m.burnoutRisk as RiskLevel} /></td>
                   {["owner", "admin"].includes(session.user.role) && (
-                    <td className="px-5 py-3.5 text-right"><ResetLinkButton userId={m.id} userName={m.name} /></td>
+                    <td className="px-5 py-3.5 flex gap-1.5 justify-end">
+                      <ResetLinkButton userId={m.id} userName={m.name} />
+                      {session.userId !== m.id && <DeactivateMemberButton userId={m.id} userName={m.name} />}
+                    </td>
                   )}
                 </tr>
               );
@@ -96,6 +102,36 @@ export default async function Team() {
           </tbody>
         </table>
       </Card>
+
+      {deactivated.length > 0 && (
+        <Card title="Deactivated Members" className="overflow-x-auto p-0">
+          <table className="w-full min-w-[720px] text-sm">
+            <thead>
+              <tr className="border-b border-line text-left text-xs text-ink-3">
+                <th className="px-5 py-3 font-medium">Member</th>
+                <th className="px-5 py-3 font-medium">Role</th>
+                <th className="px-5 py-3 font-medium">Deactivated</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {deactivated.map((m) => (
+                <tr key={m.id} className="opacity-60 transition hover:opacity-100">
+                  <td className="px-5 py-3.5">
+                    <span className="flex items-center gap-2.5">
+                      <Avatar member={m} size={30} />
+                      <span className="font-semibold text-ink-2">{m.name}</span>
+                    </span>
+                  </td>
+                  <td className="px-5 py-3.5 capitalize text-ink-3">{m.role}</td>
+                  <td className="px-5 py-3.5 text-xs text-ink-3">
+                    {m.deactivatedAt ? new Date(m.deactivatedAt).toLocaleDateString() : "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
     </div>
   );
 }

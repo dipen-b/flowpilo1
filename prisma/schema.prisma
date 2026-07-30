@@ -41,6 +41,10 @@ model User {
   role         String       @default("member") // owner | admin | member | guest
   color        String       @default("#6366f1")
   capacity     Int          @default(40)
+  active       Boolean      @default(true)
+  deactivatedAt DateTime?
+  deactivatedBy String?
+  deactivationReason String?
   orgId        String
   org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   memberships  Membership[]
@@ -59,6 +63,8 @@ model User {
   discussionReplies DiscussionReply[] @relation("ReplyAuthor")
   discussionReads DiscussionRead[]
   createdAt    DateTime     @default(now())
+
+  @@index([active])
 }
 
 model Session {
