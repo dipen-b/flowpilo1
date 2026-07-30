@@ -129,7 +129,7 @@ export function AccentPicker() {
 export function Logo({ size = 16 }: { size?: number }) {
   return (
     <Link href="/" className="flex items-center gap-2.5 font-bold text-lg tracking-tight hover:opacity-80 transition">
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{ background: "var(--brand)" }}>
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: "var(--brand)", color: "var(--brand-text)" }}>
         <Compass size={size} />
       </span>
       <span className="hidden sm:inline text-ink">FlowPilot</span>
