@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { UserCheck, AlertCircle, X } from "lucide-react";
+import { UserCheck, AlertCircle, X, CheckCircle } from "lucide-react";
 
 export function ReactivateMemberButton({ userId, userName }: { userId: string; userName: string }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   async function reactivate() {
     setLoading(true);
@@ -20,13 +21,48 @@ export function ReactivateMemberButton({ userId, userName }: { userId: string; u
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error ?? "Failed to reactivate member.");
-      setOpen(false);
-      window.location.reload();
+      
+      setSuccess(true);
+      // Reload page after 1.5 seconds to show success message
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to reactivate member.");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (success) {
+    return (
+      <>
+        <button
+          disabled
+          className="rounded-lg p-1.5 text-ink-3 opacity-50"
+        >
+          <UserCheck size={14} />
+        </button>
+        {open &&
+          createPortal(
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-black/40" />
+              <div className="float-up relative w-full max-w-md rounded-2xl border border-line bg-surface p-6 shadow-xl">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="rounded-full bg-good/10 p-3 text-good">
+                    <CheckCircle size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold tracking-tight">Reactivated!</h3>
+                    <p className="mt-1 text-sm text-ink-2">
+                      {userName} is now active. Reloading...
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
+      </>
+    );
   }
 
   return (
@@ -69,7 +105,8 @@ export function ReactivateMemberButton({ userId, userName }: { userId: string; u
               <div className="flex gap-3">
                 <button
                   onClick={() => setOpen(false)}
-                  className="flex-1 rounded-lg border border-line py-2 text-sm font-medium text-ink-2 transition hover:bg-surface-2"
+                  disabled={loading}
+                  className="flex-1 rounded-lg border border-line py-2 text-sm font-medium text-ink-2 transition hover:bg-surface-2 disabled:opacity-50"
                 >
                   Cancel
                 </button>
