@@ -13,7 +13,7 @@ export function DeactivateMemberButton({ userId, userName }: { userId: string; u
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/members/[id]/deactivate", {
+      const res = await fetch(`/api/members/${userId}/deactivate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: userId }),

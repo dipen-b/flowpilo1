@@ -31,7 +31,7 @@ export const GET = requireUser(async (req: NextRequest, context: SessionContext)
   }
   if (q) {
     taskWhere.OR = [
-      { title: { contains: q, mode: "insensitive" } },
+      { title: { contains: q } },
       { key: { contains: q.toUpperCase() } },
     ];
   }
