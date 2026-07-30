@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   staticPageGenerationTimeout: 60,
+  // Vercel rebuild trigger
 };
 
 export default nextConfig;
